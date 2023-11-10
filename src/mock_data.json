@@ -1,0 +1,162 @@
+[
+    {
+        "id": 1,
+        "name": "Aspirin",
+        "expiration_date": "2023-01-31",
+        "lot_nbr": "12345",
+        "product_code": "ABC123",
+        "serial_number": "SN001"
+    },
+    {
+        "id": 2,
+        "name": "Ibuprofen",
+        "expiration_date": "2024-05-15",
+        "lot_nbr": "67890",
+        "product_code": "DEF456",
+        "serial_number": "SN002"
+    },
+    {
+        "id": 3,
+        "name": "Amoxicillin",
+        "expiration_date": "2023-05-20",
+        "lot_nbr": "54321",
+        "product_code": "GHI789",
+        "serial_number": "SN003"
+    },
+    {
+        "id": 4,
+        "name": "Lisinopril",
+        "expiration_date": "2024-03-08",
+        "lot_nbr": "98765",
+        "product_code": "JKL012",
+        "serial_number": "SN004"
+    },
+    {
+        "id": 5,
+        "name": "Metformin",
+        "expiration_date": "2024-07-30",
+        "lot_nbr": "45678",
+        "product_code": "MNO345",
+        "serial_number": "SN005"
+    },
+    {
+        "id": 6,
+        "name": "Simvastatin",
+        "expiration_date": "2023-11-25",
+        "lot_nbr": "34567",
+        "product_code": "PQR678",
+        "serial_number": "SN006"
+    },
+    {
+        "id": 7,
+        "name": "Omeprazole",
+        "expiration_date": "2024-02-12",
+        "lot_nbr": "87654",
+        "product_code": "STU901",
+        "serial_number": "SN007"
+    },
+    {
+        "id": 8,
+        "name": "Ciprofloxacin",
+        "expiration_date": "2024-08-10",
+        "lot_nbr": "23456",
+        "product_code": "VWX234",
+        "serial_number": "SN008"
+    },
+    {
+        "id": 9,
+        "name": "Hydrochlorothiazide",
+        "expiration_date": "2023-09-05",
+        "lot_nbr": "76543",
+        "product_code": "YZA567",
+        "serial_number": "SN009"
+    },
+    {
+        "id": 10,
+        "name": "Prednisone",
+        "expiration_date": "2024-05-18",
+        "lot_nbr": "65432",
+        "product_code": "BCD890",
+        "serial_number": "SN010"
+    },
+    {
+        "id": 11,
+        "name": "Acetaminophen",
+        "expiration_date": "2023-12-15",
+        "lot_nbr": "112233",
+        "product_code": "EFG456",
+        "serial_number": "SN011"
+    },
+    {
+        "id": 12,
+        "name": "Levothyroxine",
+        "expiration_date": "2024-06-22",
+        "lot_nbr": "445566",
+        "product_code": "HIJ789",
+        "serial_number": "SN012"
+    },
+    {
+        "id": 13,
+        "name": "Gabapentin",
+        "expiration_date": "2023-06-30",
+        "lot_nbr": "778899",
+        "product_code": "KLM012",
+        "serial_number": "SN013"
+    },
+    {
+        "id": 14,
+        "name": "Amlodipine",
+        "expiration_date": "2024-04-05",
+        "lot_nbr": "990011",
+        "product_code": "NOP345",
+        "serial_number": "SN014"
+    },
+    {
+        "id": 15,
+        "name": "Warfarin",
+        "expiration_date": "2024-09-28",
+        "lot_nbr": "223344",
+        "product_code": "QRS678",
+        "serial_number": "SN015"
+    },
+    {
+        "id": 16,
+        "name": "Doxycycline",
+        "expiration_date": "2023-12-01",
+        "lot_nbr": "556677",
+        "product_code": "TUV901",
+        "serial_number": "SN016"
+    },
+    {
+        "id": 17,
+        "name": "Naproxen",
+        "expiration_date": "2024-03-20",
+        "lot_nbr": "889900",
+        "product_code": "WXY234",
+        "serial_number": "SN017"
+    },
+    {
+        "id": 18,
+        "name": "Metoprolol",
+        "expiration_date": "2024-10-15",
+        "lot_nbr": "112233",
+        "product_code": "ZAB567",
+        "serial_number": "SN018"
+    },
+    {
+        "id": 19,
+        "name": "Ranitidine",
+        "expiration_date": "2023-10-08",
+        "lot_nbr": "445566",
+        "product_code": "BCD890",
+        "serial_number": "SN019"
+    },
+    {
+        "id": 20,
+        "name": "Furosemide",
+        "expiration_date": "2024-05-25",
+        "lot_nbr": "778899",
+        "product_code": "EFG123",
+        "serial_number": "SN020"
+    }
+]
