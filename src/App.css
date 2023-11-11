@@ -37,10 +37,59 @@
   }
 }
 .center-table {
+  height: 65vh;
   display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  height: 100vh
+  justify-content: center;
+  width: 100%;
+}
+
+.App {
+  height: 100vh;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-direction: column;
+}
+
+.search-bar {
+  height: 5vh;
+  width: 70%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.left-search{
+  height: 5vh;
+  width: 50%;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+}
+
+.right-search{
+  height: 5vh;
+  width: 50%;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+}
+
+.manual-input{
+  height: 3vh;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  max-width: 100%;
+}
+
+.manual-box{
+  display: flex;
+  flex-direction: column;
+  height: 10vh;
+  width: 70%;
+  border-style: solid;
+  border-width: 1px;
 }
 
 /* Additional styling for the table if needed */

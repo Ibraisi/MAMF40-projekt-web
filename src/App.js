@@ -3,6 +3,7 @@ import fakeData from "./mock_data.json";
 import React, { useState } from "react";
 //import { useTable, useGroupBy } from "react-table";
 
+
 //Funktion för hämtning av månad från "expiration_date"
 function getMonthFromDate(dateString) {
   const date = new Date(dateString);
@@ -99,21 +100,83 @@ function App() {
     rows,
   }));
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [avdelning, setAvdelning] = useState('');
+
+  const [manName, setManName] = useState('');
+  const [manDate, setManDate] = useState('');
+  const [manLot, setManLot] = useState('');
+  const [manAvdelning, setManAvdelning] = useState('');
+  
+  const [added, setAdded] = useState('');
+
+  const options = [ //Avdelnings drop down meny
+    {label: "Alla Avdelningar", value: "all"},
+    {label: "hjärt och lung", value: "heart"},
+    {label: "Akut", value: "akut"},
+    {label: "Barn och Ungdom", value: "barn"},
+  ]
+
+
+
+  function handleSelect(event){ //Sätter in värdet i avdelning från vald i drop down
+    setAvdelning(event.target.value);
+    setAdded("");
+  }
+
+  function manHandleSelect(event){ //Sätter in värdet i manAvdelning från vald i drop down för manuell tilläggning
+    setManAvdelning(event.target.value);
+    setAdded("");
+  }
+
+  function addManually(){ //Skicka manName, manDate, manLot, manAvdelning till databas
+    setAdded("Tilläggning lyckades");
+
+  /*
+    sendToDatabase(manName, manDate, manLot, manAvdelning);
+  */
+
+  }
+
   // Render the table
   return (
     <div className="App" >
+      {/*<h1>{avdelning}</h1> test av dropdown*/}
+      {/*<h1>{manName}</h1> {/*test av sökfält*/}
+      {/*<h1>{manDate}</h1> {/*test av sökfält*/}
+      {/*<h1>{manLot}</h1> {/*test av sökfält*/}
+      {/*<h1>{manAvdelning}</h1> {/*test av sökfält*/}
+      <div className="search-bar">{/* Div till val av avdelning och sökning av produkt */}
+      
+        <div className="left-search">
+          <select className="avdelning" onChange={handleSelect}> {/* Dropdown meny */}
+            {options.map(option => (
+              <option value={option.value}>{option.label}</option>
+              ))}
+          </select>
+        </div>
+        <div className="right-search">
+          <div>
+            <input
+                placeholder="Sök efter Batch/Läkemedelsnamn"
+                onChange={(e) => {setSearchTerm(e.target.value); setAdded("")}}
+              />
+          </div>
+        </div>
+      </div>
+
+
       <div className="center-table">
         <div
           style={{
             width: "75%",
-            height: "600px",
+            height: "65vh",
             overflowY: "auto",
+            border: "1px solid #000",
           }}
         >
           <table
             style={{
-              borderCollapse: "collapse",
-              border: "2px solid #000",
               width: "100%",
             }}
           >
@@ -164,6 +227,36 @@ function App() {
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <div className="manual-box"> {/* Div till Manuell input av läkemedel */}
+        <div><p>Lägg Till Manuellt</p></div>
+
+        <div className="manual-input">
+          <input
+            placeholder="Läkemedelsnamn"
+            onChange={(e) => {setManName(e.target.value); setAdded("")}}              
+          />
+          <input
+            placeholder="ÅÅÅÅ/MM/DD"
+            onChange={(e) => {setManDate(e.target.value); setAdded("")}}
+          />
+          <input
+            placeholder="Batch nr"
+            onChange={(e) => {setManLot(e.target.value); setAdded("")}}
+          />
+          <select className="avdelning" onChange={manHandleSelect}> {/* Dropdown meny */}
+              {options.map(option => (
+                <option value={option.value}>{option.label}</option>
+                ))}
+            </select>
+          <button
+            onClick={() => addManually()}
+          >
+          Lägg Till 
+          </button>
+          <p>{added}</p>
         </div>
       </div>
     </div>
