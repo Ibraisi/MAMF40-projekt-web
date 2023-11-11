@@ -82,6 +82,7 @@
   align-items: center;
   max-width: 100%;
   overflow: hidden;
+  flex-wrap: wrap; 
 }
 
 .manual-box{
@@ -91,6 +92,7 @@
   width: 70%;
   border-style: solid;
   border-width: 1px;
+  
 }
 
 .textAdd{
@@ -98,6 +100,7 @@
   font-size: 20px;
   margin-top: 5px;
 }
+
 
 /* Additional styling for the table if needed */
 table {

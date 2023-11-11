@@ -117,7 +117,7 @@ function App() {
     {label: "Barn och Ungdom", value: "barn"},
   ]
 
-
+  const isComputer = window.innerWidth >= 500; //kollar om det är dator, 
 
   function handleSelect(event){ //Sätter in värdet i avdelning från vald i drop down
     setAvdelning(event.target.value);
@@ -158,7 +158,7 @@ function App() {
         <div className="right-search">
           <div className="right-search">
             <input 
-                style={{width:"60%"}}
+                style={{width:"200px"}}
                 placeholder="Sök efter Batch/Läkemedelsnamn"
                 onChange={(e) => {setSearchTerm(e.target.value); setAdded("")}}
               />
@@ -231,35 +231,37 @@ function App() {
         </div>
       </div>
 
-      <div className="manual-box"> {/* Div till Manuell input av läkemedel */}
-        <div style={{height: "40px", width: "100%"}}><p className="textAdd">Lägg Till Manuellt</p></div>
+      {isComputer ?
+        <div className="manual-box"> {/* Div till Manuell input av läkemedel */}
+          <div style={{height: "40px", width: "100%"}}><p className="textAdd">Lägg Till Manuellt</p></div>
 
-        <div className="manual-input">
-          <input
-            placeholder="Läkemedelsnamn"
-            onChange={(e) => {setManName(e.target.value); setAdded("")}}              
-          />
-          <input
-            placeholder="ÅÅÅÅ/MM/DD"
-            onChange={(e) => {setManDate(e.target.value); setAdded("")}}
-          />
-          <input
-            placeholder="Batch nr"
-            onChange={(e) => {setManLot(e.target.value); setAdded("")}}
-          />
-          <select className="avdelning" onChange={manHandleSelect}> {/* Dropdown meny */}
-              {options.map(option => (
-                <option value={option.value}>{option.label}</option>
-                ))}
-            </select>
-          <button
-            onClick={() => addManually()}
-          >
-          Lägg Till 
-          </button>
-          <p>{added}</p>
+          <div className="manual-input">
+            <input
+              placeholder="Läkemedelsnamn"
+              onChange={(e) => {setManName(e.target.value); setAdded("")}}              
+            />
+            <input
+              placeholder="ÅÅÅÅ/MM/DD"
+              onChange={(e) => {setManDate(e.target.value); setAdded("")}}
+            />
+            <input
+              placeholder="Batch nr"
+              onChange={(e) => {setManLot(e.target.value); setAdded("")}}
+            />
+            <select className="avdelning" onChange={manHandleSelect}> {/* Dropdown meny */}
+                {options.map(option => (
+                  <option value={option.value}>{option.label}</option>
+                  ))}
+              </select>
+            <button
+              onClick={() => addManually()}
+            >
+            Lägg Till 
+            </button>
+            <p>{added}</p>
+          </div>
         </div>
-      </div>
+      : [] }            
     </div>
   );
 }
