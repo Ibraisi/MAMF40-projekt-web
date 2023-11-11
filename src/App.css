@@ -81,6 +81,7 @@
   justify-content: space-evenly;
   align-items: center;
   max-width: 100%;
+  overflow: hidden;
 }
 
 .manual-box{
@@ -90,6 +91,12 @@
   width: 70%;
   border-style: solid;
   border-width: 1px;
+}
+
+.textAdd{
+  font-weight: bold;
+  font-size: 20px;
+  margin-top: 5px;
 }
 
 /* Additional styling for the table if needed */

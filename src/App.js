@@ -149,15 +149,16 @@ function App() {
       <div className="search-bar">{/* Div till val av avdelning och sökning av produkt */}
       
         <div className="left-search">
-          <select className="avdelning" onChange={handleSelect}> {/* Dropdown meny */}
+          <select className="avdelning" style={{width:"40%"}} onChange={handleSelect}> {/* Dropdown meny */}
             {options.map(option => (
               <option value={option.value}>{option.label}</option>
               ))}
           </select>
         </div>
         <div className="right-search">
-          <div>
-            <input
+          <div className="right-search">
+            <input 
+                style={{width:"60%"}}
                 placeholder="Sök efter Batch/Läkemedelsnamn"
                 onChange={(e) => {setSearchTerm(e.target.value); setAdded("")}}
               />
@@ -231,7 +232,7 @@ function App() {
       </div>
 
       <div className="manual-box"> {/* Div till Manuell input av läkemedel */}
-        <div><p>Lägg Till Manuellt</p></div>
+        <div style={{height: "40px", width: "100%"}}><p className="textAdd">Lägg Till Manuellt</p></div>
 
         <div className="manual-input">
           <input
