@@ -1,6 +1,7 @@
 import "./App.css";
 import fakeData from "./mock_data.json";
 import React, { useState } from "react";
+import Popup from './components/popup';
 //import { useTable, useGroupBy } from "react-table";
 
 
@@ -103,6 +104,8 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [avdelning, setAvdelning] = useState('');
 
+  const[buttonPopup, setButtonPopup] = useState(false);
+
   const [manName, setManName] = useState('');
   const [manDate, setManDate] = useState('');
   const [manLot, setManLot] = useState('');
@@ -112,6 +115,12 @@ function App() {
 
   const options = [ //Avdelnings drop down meny
     {label: "Alla Avdelningar", value: "all"},
+    {label: "hjärt och lung", value: "heart"},
+    {label: "Akut", value: "akut"},
+    {label: "Barn och Ungdom", value: "barn"},
+  ]
+
+  const optionsAdd = [ //Avdelnings drop down meny
     {label: "hjärt och lung", value: "heart"},
     {label: "Akut", value: "akut"},
     {label: "Barn och Ungdom", value: "barn"},
@@ -130,6 +139,7 @@ function App() {
   }
 
   function addManually(){ //Skicka manName, manDate, manLot, manAvdelning till databas
+    setButtonPopup(true);
     setAdded("Tilläggning lyckades");
 
   /*
@@ -250,7 +260,7 @@ function App() {
               onChange={(e) => {setManLot(e.target.value); setAdded("")}}
             />
             <select className="manual-input" onChange={manHandleSelect}> {/* Dropdown meny */}
-                {options.map(option => (
+                {optionsAdd.map(option => (
                   <option value={option.value}>{option.label}</option>
                   ))}
               </select>
@@ -260,7 +270,17 @@ function App() {
             <p style={{height: "20px",}}>{added}</p>
           </div>
         </div>
-      : [] }            
+      : [] }  
+
+      <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
+        <h3>Lägg till:</h3>
+        <p>Läkemedelsnamn: {manName}</p>
+        <p>Utgångsdatum: {manDate}</p>
+        <p>Batch nr: {manLot}</p>
+        <p>Avdelning: {manAvdelning}</p>
+      </Popup>
+
+
     </div>
   );
 }
