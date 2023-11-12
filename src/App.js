@@ -155,6 +155,9 @@ function App() {
               ))}
           </select>
         </div>
+        <div className="title-div">
+          <p className="title-name">Med-skAPP</p>
+        </div>
         <div className="right-search">
           <div className="right-search">
             <input 
@@ -184,7 +187,7 @@ function App() {
                         border: "1px solid #000",
                         textAlign: "left",
                         height: "40px",
-                        background: "#87CEEB",
+                        background: "#d2d2d2",
                       }}
                     >
                       <td className="bold-cell" colSpan="10">
@@ -251,7 +254,7 @@ function App() {
                   <option value={option.value}>{option.label}</option>
                   ))}
               </select>
-            <button
+            <button className="button-add"
               onClick={() => addManually()}
             >Lägg Till</button>
             <p style={{height: "20px",}}>{added}</p>
