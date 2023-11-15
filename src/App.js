@@ -150,12 +150,7 @@ function App() {
 
   // Render the table
   return (
-    <div className="App" >
-      {/*<h1>{avdelning}</h1> test av dropdown*/}
-      {/*<h1>{manName}</h1> {/*test av sökfält*/}
-      {/*<h1>{manDate}</h1> {/*test av sökfält*/}
-      {/*<h1>{manLot}</h1> {/*test av sökfält*/}
-      {/*<h1>{manAvdelning}</h1> {/*test av sökfält*/}
+    <div className="App">
       <div className="search-bar">{/* Div till val av avdelning och sökning av produkt */}
       
         <div className="left-search">
@@ -212,7 +207,7 @@ function App() {
                       <th>ID</th>
                       <th>Namn på läkemedel</th>
                       <th>Utgångsdatum</th>
-                      <th>LOT-nummer</th>
+                      <th>Batch-nummer</th>
                       <th>Produktkod</th>
                       <th>Serienummer</th>
                     </tr>

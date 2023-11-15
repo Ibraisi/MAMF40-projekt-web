@@ -8,7 +8,7 @@ function Popup(props) {
                 { props.children }
 
                 <button className="close-btn" onClick={() => props.setTrigger(false) } >Avbryt</button>
-                <button className="confirm-btn" onClick={() => props.setTrigger(false) } >Lägg till</button>
+                <button className="confirm-btn" onClick={() => props.setTrigger(false) /* skicka datan till databasen */} >Lägg till</button>
                 
 
             </div>
