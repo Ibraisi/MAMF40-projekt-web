@@ -1,5 +1,6 @@
 import React from 'react'
 import './popup.css'
+import submitManually from '../App'
 
 function Popup(props) {
     return (props.trigger) ? (
@@ -8,7 +9,7 @@ function Popup(props) {
                 { props.children }
 
                 <button className="close-btn" onClick={() => props.setTrigger(false) } >Avbryt</button>
-                <button className="confirm-btn" onClick={() => props.setTrigger(false) } >Lägg till</button>
+                <button className="confirm-btn" onClick={() => {props.setTrigger(false); props.setManually(); }} >Lägg till</button>
                 
 
             </div>

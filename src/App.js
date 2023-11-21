@@ -3,6 +3,9 @@ import fakeData from "./mock_data.json";
 import React, { useState } from "react";
 import Popup from './components/popup';
 //import { useTable, useGroupBy } from "react-table";
+import { validateSection, submitScannedItems, parseItemData, submitScannedItem } from './handles/firebaseHandler';
+import MedInformation from '/Users/rasmusivarsson/Desktop/MAMF40-projekt-web/src/data/MedInformation.js';
+ 
 
 
 //Funktion för hämtning av månad från "expiration_date"
@@ -42,6 +45,7 @@ function sortByMonth(data) {
 }
 
 function App() {
+
   console.log(fakeData);
   const data = React.useMemo(() => fakeData, []);
   //Dataset från JSON
@@ -140,12 +144,11 @@ function App() {
 
   function addManually(){ //Skicka manName, manDate, manLot, manAvdelning till databas
     setButtonPopup(true);
+  }
+  
+  function submitManually(){
     setAdded("Tilläggning lyckades");
-
-  /*
-    sendToDatabase(manName, manDate, manLot, manAvdelning);
-  */
-
+    submitScannedItem(manName, manDate, manLot, manAvdelning);
   }
 
   // Render the table
@@ -272,7 +275,7 @@ function App() {
         </div>
       : [] }  
 
-      <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
+      <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually}>
         <h3>Lägg till:</h3>
         <p>Läkemedelsnamn: {manName}</p>
         <p>Utgångsdatum: {manDate}</p>
