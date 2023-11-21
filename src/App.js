@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Popup from './components/popup';
 //import { useTable, useGroupBy } from "react-table";
 import { validateSection, submitScannedItems, parseItemData, submitScannedItem } from './handles/firebaseHandler';
-import MedInformation from '/Users/rasmusivarsson/Desktop/MAMF40-projekt-web/src/data/MedInformation.js';
  
 
 
@@ -254,12 +253,12 @@ function App() {
             />
             <input
               className="manual-input"
-              placeholder="ÅÅÅÅ/MM/DD"
+              placeholder="Utgångsdatum(ÅÅÅÅ-MM-DD)"
               onChange={(e) => {setManDate(e.target.value); setAdded("")}}
             />
             <input
               className="manual-input"
-              placeholder="Batch nr"
+              placeholder="Batch-nr"
               onChange={(e) => {setManLot(e.target.value); setAdded("")}}
             />
             <select className="manual-input" onChange={manHandleSelect}> {/* Dropdown meny */}

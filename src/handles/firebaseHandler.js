@@ -1,7 +1,7 @@
 import { db } from "../firebase_setup/firebase"
 import { addDoc, getDocs, collection, query, where } from "@firebase/firestore"
 import { async } from '@firebase/util';
-import MedInformation from '/Users/rasmusivarsson/Desktop/MAMF40-projekt-web/src/data/MedInformation.js';
+import MedInformation from '../data/MedInformation.js';
  
 export const validateSection = async (sectionId) => {
     console.log("Querying for ID:", sectionId); // Log the ID being queried
