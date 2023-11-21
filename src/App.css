@@ -173,6 +173,18 @@
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   
 }
+.button-remove{
+  height: 30px;
+  width: 25px;
+  border-radius: 20px;
+  border: 4px;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  font-size: 20px; 
+  transition: background-color 0.1s;
+}
+.button-remove:active {
+  background-color: #333; /* Darker shade when pressed */
+}
 
 
 

@@ -3,7 +3,7 @@ import fakeData from "./mock_data.json";
 import React, { useState } from "react";
 import Popup from './components/popup';
 //import { useTable, useGroupBy } from "react-table";
-import { validateSection, submitScannedItems, parseItemData, submitScannedItem } from './handles/firebaseHandler';
+import { validateSection, submitScannedItems, parseItemData, submitScannedItem, deleteItem } from './handles/firebaseHandler';
  
 
 
@@ -151,6 +151,10 @@ function App() {
     setAdded("Tilläggning lyckades");
     submitScannedItem(manName, manDate, manLot, manAvdelning);
   }
+  function removeManually(){
+    setAdded("Borttagning lyckades");
+
+  }
 
   // Render the table
   return (
@@ -202,6 +206,7 @@ function App() {
                         textAlign: "left",
                         height: "40px",
                         background: "#d2d2d2",
+                        fontSize: "20px"
                       }}
                     >
                       <td className="bold-cell" colSpan="10">
@@ -231,6 +236,14 @@ function App() {
                         <td>{row.name}</td>
                         <td>{row.expiration_date}</td>
                         <td>{row.lot_nbr}</td>
+                        <td> 
+      <button
+        className="button-remove"
+        onClick={() => deleteItem(row.name, row.expiration_date, row.lot_nbr)}
+      >
+        X
+      </button>
+    </td>
                         {/*<td>{row.product_code}</td>*/}
                         {/*<td>{row.serial_number}</td>*/}
                       </tr>
