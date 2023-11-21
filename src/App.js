@@ -86,6 +86,7 @@ function App() {
       ...row,
       month: getMonthFromDate(row.expiration_date),
     }));
+    //Checka om det finns searchTerm, if(searchterm hittas i antingingen namn eller batch-rader), om inget hittas, skriv ut allt
     return sortByMonth(rawData);
   }, []);
 
@@ -103,6 +104,7 @@ function App() {
     month,
     rows,
   }));
+  //Datan ovanför söks igenom  i sökfunktion
 
   const [searchTerm, setSearchTerm] = useState('');
   const [avdelning, setAvdelning] = useState('');
@@ -175,7 +177,7 @@ function App() {
             <input 
                 className="searchBox"
                 placeholder="Sök efter Batch/Läkemedelsnamn"
-                onChange={(e) => {setSearchTerm(e.target.value); setAdded("")}}
+                onChange={(e) => {setSearchTerm(e.target.value); setAdded("")}} //Innuti klamrar , skapa funktion som hämtar sökt objekt från JSON-fil
               />
           </div>
         </div>
@@ -211,12 +213,12 @@ function App() {
                         border: "1px solid #000",
                       }}
                     >
-                      <th>ID</th>
+                      {/*<th>ID</th>*/}
                       <th>Namn på läkemedel</th>
                       <th>Utgångsdatum</th>
                       <th>LOT-nummer</th>
-                      <th>Produktkod</th>
-                      <th>Serienummer</th>
+                      {/*<th>Produktkod</th>*/}
+                      {/*<th>Serienummer</th>*/}
                     </tr>
                     {rows.map((row) => (
                       <tr
@@ -225,12 +227,12 @@ function App() {
                           border: "0.5px solid grey"
                         }}
                       >
-                        <td>{row.id}</td>
+                        {/*<td>{row.id}</td>*/}
                         <td>{row.name}</td>
                         <td>{row.expiration_date}</td>
                         <td>{row.lot_nbr}</td>
-                        <td>{row.product_code}</td>
-                        <td>{row.serial_number}</td>
+                        {/*<td>{row.product_code}</td>*/}
+                        {/*<td>{row.serial_number}</td>*/}
                       </tr>
                     ))}
                   </React.Fragment>
@@ -281,8 +283,6 @@ function App() {
         <p>Batch nr: {manLot}</p>
         <p>Avdelning: {manAvdelning}</p>
       </Popup>
-
-
     </div>
   );
 }
