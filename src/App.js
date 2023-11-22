@@ -45,6 +45,9 @@ function sortByMonth(data) {
 
 function App() {
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const isSearchTermEmpty = searchTerm.trim() === '';
+
   console.log(fakeData);
   const data = React.useMemo(() => fakeData, []);
   //Dataset från JSON
@@ -104,9 +107,33 @@ function App() {
     month,
     rows,
   }));
+
+// Filtrera raderna efter antingen läkemedelsnamn eller lot-nummer
+const filteredRows = dataWithMonth.filter((row) =>
+(row.name.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
+  row.lot_nbr.toLowerCase().includes(searchTerm.trim().toLowerCase()))
+);
+
+// Gruppen omstruktureras med filtrerade rader
+const filteredGroupedData = filteredRows.reduce((acc, row) => {
+const month = row.month;
+if (!acc[month]) {
+  acc[month] = [];
+}
+acc[month].push(row);
+return acc;
+}, {});
+
+const filteredGroupedRows = Object.entries(filteredGroupedData).map(
+([month, rows]) => ({
+  month,
+  rows,
+})
+);
+  
   //Datan ovanför söks igenom  i sökfunktion
 
-  const [searchTerm, setSearchTerm] = useState('');
+  
   const [avdelning, setAvdelning] = useState('');
 
   const[buttonPopup, setButtonPopup] = useState(false);
@@ -198,7 +225,12 @@ function App() {
             >
               <thead>{/* OM MAN VILL LÄGGA NÅGOT I TABLE HEAD SENARE */}</thead>
               <tbody>
-                {groupedRows.map(({ month, rows }) => (
+
+                {/*Om sökfönster är tomt, renderea som vanligt, annars rendererar man bara de sökninens träffar
+                 baserat på läkemedelsnamn eller LOT-nummer */}
+                 
+                {isSearchTermEmpty ? 
+                (groupedRows.map(({ month, rows }) => (
                   <React.Fragment key={month}>
                     <tr
                       style={{
@@ -237,18 +269,72 @@ function App() {
                         <td>{row.expiration_date}</td>
                         <td>{row.lot_nbr}</td>
                         <td> 
-      <button
-        className="button-remove"
-        onClick={() => deleteItem(row.name, row.expiration_date, row.lot_nbr)}
-      >
-        X
-      </button>
-    </td>
+                           <button
+                              className="button-remove"
+                              onClick={() => deleteItem(row.name, row.expiration_date, row.lot_nbr)}
+                            >
+                              X
+                            </button>
+                          </td>
                         {/*<td>{row.product_code}</td>*/}
                         {/*<td>{row.serial_number}</td>*/}
                       </tr>
                     ))}
                   </React.Fragment>
+                ))
+                ):(
+                  filteredGroupedRows.map(({ month, rows }) => (
+                  <React.Fragment key={month}>
+                    <tr
+                      style={{
+                        border: "1px solid #000",
+                        textAlign: "left",
+                        height: "40px",
+                        background: "#d2d2d2",
+                        fontSize: "20px"
+                      }}
+                    >
+                      <td className="bold-cell" colSpan="10">
+                        {getMonthNameFromNumber(month)}
+                      </td>
+                    </tr>
+                    <tr
+                      style={{
+                        border: "1px solid #000",
+                      }}
+                    >
+                      {/*<th>ID</th>*/}
+                      <th>Namn på läkemedel</th>
+                      <th>Utgångsdatum</th>
+                      <th>LOT-nummer</th>
+                      {/*<th>Produktkod</th>*/}
+                      {/*<th>Serienummer</th>*/}
+                    </tr>
+                    {rows.map((row) => (
+                      <tr
+                        key={row.id}
+                        style={{
+                          border: "0.5px solid grey"
+                        }}
+                      >
+                        {/*<td>{row.id}</td>*/}
+                        <td>{row.name}</td>
+                        <td>{row.expiration_date}</td>
+                        <td>{row.lot_nbr}</td>
+                        <td> 
+                           <button
+                              className="button-remove"
+                              onClick={() => deleteItem(row.name, row.expiration_date, row.lot_nbr)}
+                            >
+                              X
+                            </button>
+                          </td>
+                        {/*<td>{row.product_code}</td>*/}
+                        {/*<td>{row.serial_number}</td>*/}
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                  )
                 ))}
               </tbody>
             </table>
