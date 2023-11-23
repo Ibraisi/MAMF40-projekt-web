@@ -1,6 +1,6 @@
 import { db } from "../firebase_setup/firebase"
 import { addDoc, getDocs, collection, query, where } from "@firebase/firestore"
-import { async } from '@firebase/util';
+//import { async } from '@firebase/util';
 import MedInformation from '../data/MedInformation.js';
  
 export const validateSection = async (sectionId) => {
@@ -23,6 +23,28 @@ export const validateSection = async (sectionId) => {
       return null;
     }
   };
+
+  export const getMedData = async () => {
+    console.log("query for meds");
+
+    const q = query(collection(db, "med-data"));
+
+    const querySnapshot = await getDocs(q);
+    try {
+        const querySnapshot = await getDocs(q);
+        console.log("Query results:", querySnapshot.docs.map(doc => doc.data())); // Log the query results
+    
+        if (!querySnapshot.empty) {
+          const document = querySnapshot.docs[0].data();
+          return document.name;
+        } else {
+          return null;
+        }
+      } catch (error) {
+        console.error("Error validating section: ", error);
+        return null;
+      }
+  }
 
   export const submitScannedItem = async (manName, manDate, manLot, manAvdelning) => {
     try {

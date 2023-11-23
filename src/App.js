@@ -3,7 +3,7 @@ import fakeData from "./mock_data.json";
 import React, { useState } from "react";
 import Popup from './components/popup';
 //import { useTable, useGroupBy } from "react-table";
-import { validateSection, submitScannedItems, parseItemData, submitScannedItem } from './handles/firebaseHandler';
+import { validateSection, getMedData, parseItemData, submitScannedItem } from './handles/firebaseHandler';
  
 
 
@@ -46,6 +46,7 @@ function sortByMonth(data) {
 function App() {
 
   console.log(fakeData);
+  getMedData();
   const data = React.useMemo(() => fakeData, []);
   //Dataset från JSON
   const columns = React.useMemo(
@@ -118,13 +119,13 @@ function App() {
 
   const options = [ //Avdelnings drop down meny
     {label: "Alla Avdelningar", value: "all"},
-    {label: "hjärt och lung", value: "heart"},
+    {label: "Hjärt och lung", value: "heart"},
     {label: "Akut", value: "akut"},
     {label: "Barn och Ungdom", value: "barn"},
   ]
 
   const optionsAdd = [ //Avdelnings drop down meny
-    {label: "hjärt och lung", value: "heart"},
+    {label: "Hjärt och lung", value: "heart"},
     {label: "Akut", value: "akut"},
     {label: "Barn och Ungdom", value: "barn"},
   ]
