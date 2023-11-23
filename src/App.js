@@ -3,7 +3,7 @@ import fakeData from "./mock_data.json";
 import React, { useState } from "react";
 import Popup from './components/popup';
 //import { useTable, useGroupBy } from "react-table";
-import { validateSection, getMedData, parseItemData, submitScannedItem } from './handles/firebaseHandler';
+import { validateSection, getMedData, parseItemData, submitScannedItem, deleteItem } from './handles/firebaseHandler';
  
 
 
@@ -44,6 +44,9 @@ function sortByMonth(data) {
 }
 
 function App() {
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const isSearchTermEmpty = searchTerm.trim() === '';
 
   console.log(fakeData);
   getMedData();
@@ -87,6 +90,7 @@ function App() {
       ...row,
       month: getMonthFromDate(row.expiration_date),
     }));
+    //Checka om det finns searchTerm, if(searchterm hittas i antingingen namn eller batch-rader), om inget hittas, skriv ut allt
     return sortByMonth(rawData);
   }, []);
 
@@ -105,7 +109,32 @@ function App() {
     rows,
   }));
 
-  const [searchTerm, setSearchTerm] = useState('');
+// Filtrera raderna efter antingen läkemedelsnamn eller lot-nummer
+const filteredRows = dataWithMonth.filter((row) =>
+(row.name.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
+  row.lot_nbr.toLowerCase().includes(searchTerm.trim().toLowerCase()))
+);
+
+// Gruppen omstruktureras med filtrerade rader
+const filteredGroupedData = filteredRows.reduce((acc, row) => {
+const month = row.month;
+if (!acc[month]) {
+  acc[month] = [];
+}
+acc[month].push(row);
+return acc;
+}, {});
+
+const filteredGroupedRows = Object.entries(filteredGroupedData).map(
+([month, rows]) => ({
+  month,
+  rows,
+})
+);
+const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
+  //Datan ovanför söks igenom  i sökfunktion
+
+  
   const [avdelning, setAvdelning] = useState('');
 
   const[buttonPopup, setButtonPopup] = useState(false);
@@ -150,6 +179,10 @@ function App() {
     setAdded("Tilläggning lyckades");
     submitScannedItem(manName, manDate, manLot, manAvdelning);
   }
+  function removeManually(){
+    setAdded("Borttagning lyckades");
+
+  }
 
   // Render the table
   return (
@@ -176,12 +209,11 @@ function App() {
             <input 
                 className="searchBox"
                 placeholder="Sök efter Batch/Läkemedelsnamn"
-                onChange={(e) => {setSearchTerm(e.target.value); setAdded("")}}
+                onChange={(e) => {setSearchTerm(e.target.value); setAdded("")}} //Innuti klamrar , skapa funktion som hämtar sökt objekt från JSON-fil
               />
           </div>
         </div>
       </div>
-
 
       <div className="center-table">
         <div className="table-outer-div">
@@ -193,7 +225,10 @@ function App() {
             >
               <thead>{/* OM MAN VILL LÄGGA NÅGOT I TABLE HEAD SENARE */}</thead>
               <tbody>
-                {groupedRows.map(({ month, rows }) => (
+
+                {/*Om sökfönster är tomt, renderea som vanligt, annars rendererar man bara de sökninens träffar
+                 baserat på läkemedelsnamn eller LOT-nummer. filterChoice sätts beroende på sökrutans inehåll*/}
+                {(filterChoice.map(({ month, rows }) => (
                   <React.Fragment key={month}>
                     <tr
                       style={{
@@ -201,6 +236,7 @@ function App() {
                         textAlign: "left",
                         height: "40px",
                         background: "#d2d2d2",
+                        fontSize: "20px"
                       }}
                     >
                       <td className="bold-cell" colSpan="10">
@@ -212,12 +248,12 @@ function App() {
                         border: "1px solid #000",
                       }}
                     >
-                      <th>ID</th>
+                      {/*<th>ID</th>*/}
                       <th>Namn på läkemedel</th>
                       <th>Utgångsdatum</th>
                       <th>LOT-nummer</th>
-                      <th>Produktkod</th>
-                      <th>Serienummer</th>
+                      {/*<th>Produktkod</th>*/}
+                      {/*<th>Serienummer</th>*/}
                     </tr>
                     {rows.map((row) => (
                       <tr
@@ -226,16 +262,24 @@ function App() {
                           border: "0.5px solid grey"
                         }}
                       >
-                        <td>{row.id}</td>
+                        {/*<td>{row.id}</td>*/}
                         <td>{row.name}</td>
                         <td>{row.expiration_date}</td>
                         <td>{row.lot_nbr}</td>
-                        <td>{row.product_code}</td>
-                        <td>{row.serial_number}</td>
+                        <td> 
+                           <button
+                              className="button-remove"
+                              onClick={() => deleteItem(row.name, row.expiration_date, row.lot_nbr)}
+                            >
+                              X
+                            </button>
+                          </td>
+                        {/*<td>{row.product_code}</td>*/}
+                        {/*<td>{row.serial_number}</td>*/}
                       </tr>
                     ))}
                   </React.Fragment>
-                ))}
+                )))} 
               </tbody>
             </table>
           </div>
@@ -282,8 +326,6 @@ function App() {
         <p>Batch nr: {manLot}</p>
         <p>Avdelning: {manAvdelning}</p>
       </Popup>
-
-
     </div>
   );
 }
