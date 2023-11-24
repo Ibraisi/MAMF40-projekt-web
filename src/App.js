@@ -101,10 +101,10 @@ function App() {
     rows,
   }));
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(''); /* Const för värde för */
   const [avdelning, setAvdelning] = useState('');
 
-  const[buttonPopup, setButtonPopup] = useState(false);
+  const [buttonPopup, setButtonPopup] = useState(false);
 
   const [manName, setManName] = useState('');
   const [manDate, setManDate] = useState('');
@@ -141,11 +141,10 @@ function App() {
   function addManually(){ //Skicka manName, manDate, manLot, manAvdelning till databas
     setButtonPopup(true);
     setAdded("Tilläggning lyckades");
+  }
 
-  /*
-    sendToDatabase(manName, manDate, manLot, manAvdelning);
-  */
-
+  function addToDatabase(){
+    handlesubmit(manName, manDate, manLot, manAvdelning);
   }
 
   // Render the table
@@ -238,22 +237,22 @@ function App() {
         <div className="manual-box"> {/* Div till Manuell input av läkemedel */}
           <div style={{height: "40px", width: "100%"}}><p className="textAdd">Lägg Till Manuellt</p></div>
 
-          <div className="manual-input-div">
-            <input
+          <div className="manual-input-div"> 
+            <input 
               className="manual-input"
               placeholder="Läkemedelsnamn"
               onChange={(e) => {setManName(e.target.value); setAdded("")}}              
-            />
-            <input
+            />{/* inmatning */}
+            <input 
               className="manual-input"
               placeholder="ÅÅÅÅ/MM/DD"
               onChange={(e) => {setManDate(e.target.value); setAdded("")}}
-            />
-            <input
+            />{/* inmatning */}
+            <input 
               className="manual-input"
               placeholder="Batch nr"
               onChange={(e) => {setManLot(e.target.value); setAdded("")}}
-            />
+            />{/* inmatning */}
             <select className="manual-input" onChange={manHandleSelect}> {/* Dropdown meny */}
                 {optionsAdd.map(option => (
                   <option value={option.value}>{option.label}</option>
@@ -267,7 +266,7 @@ function App() {
         </div>
       : [] }  
 
-      <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
+      <Popup trigger={buttonPopup} setTrigger={setButtonPopup}> {/* Popup */}
         <h3>Lägg till:</h3>
         <p>Läkemedelsnamn: {manName}</p>
         <p>Utgångsdatum: {manDate}</p>
