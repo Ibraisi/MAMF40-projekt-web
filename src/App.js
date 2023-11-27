@@ -205,7 +205,6 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
   function submitManually(){
     setAdded("Tilläggning lyckades");
     submitScannedItem(manName, manDate, manLot, manAvdelning);
-    setManName('');
   }
   function removeManually(){
     setRemoveButtonPopup(true);
