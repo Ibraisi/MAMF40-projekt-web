@@ -13,6 +13,12 @@ function getMonthFromDate(dateString) {
   const month = date.getMonth() + 1; //Returnerar ett heltal som representerar utgångsdatumets månad
   return month;
 }
+function getYearFromDate(dateString) {
+  const date = new Date(dateString);
+  const year = date.getFullYear; //Returnerar ett heltal som representerar utgångsdatumets år
+  return year;
+}
+
 //Hämtar namnet på månaden baserat på siffran från getMonthFromDate, kontrollerar om siffran är giltig
 function getMonthNameFromNumber(monthNumber) {
   const months = [
@@ -41,6 +47,25 @@ function sortByMonth(data) {
     (a, b) =>
       getMonthFromDate(a.expiration_date) - getMonthFromDate(b.expiration_date)
   );
+}
+const currentDate = new Date();
+
+function expireSoon(insertedDate){
+  const inputDate = new Date(insertedDate);
+
+  const timeDifference = inputDate.getTime() - currentDate.getTime();
+
+  const twoWeeksInMilliseconds = 2 * 7 * 24 * 60 * 60 * 1000;
+
+  return timeDifference >= 0 && timeDifference <= twoWeeksInMilliseconds;
+}
+
+function expired(insertedDate){
+  const inputDate = new Date(insertedDate);
+
+  const timeDifference = inputDate.getTime() - currentDate.getTime();
+
+  return timeDifference <= 0;
 }
 
 function App() {
@@ -84,6 +109,7 @@ function App() {
   //const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
    //useTable({ columns, data }, useGroupBy);
 
+   
   const dataWithMonth = React.useMemo(() => {
     const rawData = fakeData.map((row) => ({
       ...row,
@@ -95,13 +121,15 @@ function App() {
 
   // Gruppera alla rader i månads-avsnitt
   const groupedData = dataWithMonth.reduce((acc, row) => {
-    const month = row.month;
+    const {month} = row;
+    const key = {month};
     if (!acc[month]) {
       acc[month] = [];
     }
     acc[month].push(row);
     return acc;
   }, {});
+  
 
   const groupedRows = Object.entries(groupedData).map(([month, rows]) => ({
     month,
@@ -133,6 +161,15 @@ const filteredGroupedRows = Object.entries(filteredGroupedData).map(
 const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
   //Datan ovanför söks igenom  i sökfunktion
 
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleHover = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
   
   const [avdelning, setAvdelning] = useState('');
 
@@ -180,7 +217,6 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
   }
   function removeManually(){
     setAdded("Borttagning lyckades");
-
   }
 
   // Render the table
@@ -227,7 +263,8 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
 
                 {/*Om sökfönster är tomt, renderea som vanligt, annars rendererar man bara de sökninens träffar
                  baserat på läkemedelsnamn eller LOT-nummer. filterChoice sätts beroende på sökrutans inehåll*/}
-                {(filterChoice.map(({ month, rows }) => (
+                
+                {(filterChoice.map(({month, rows}) => (
                   <React.Fragment key={month}>
                     <tr
                       style={{
@@ -247,7 +284,7 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
                         border: "1px solid #000",
                       }}
                     >
-                      {/*<th>ID</th>*/}
+                      <th></th>
                       <th>Namn på läkemedel</th>
                       <th>Utgångsdatum</th>
                       <th>LOT-nummer</th>
@@ -258,20 +295,42 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
                       <tr
                         key={row.id}
                         style={{
-                          border: "0.5px solid grey"
+                          border: "0.5px solid grey",
+                          background: expireSoon(row.expiration_date) ? "#ea6e6e" 
+                          :expired(row.expiration_date )? "#ea6e6e" 
+                          :"#fff",
                         }}
                       >
                         {/*<td>{row.id}</td>*/}
-                        <td>{row.name}</td>
+                        
+                          
+                          {expireSoon(row.expiration_date) ? (
+                          <td>
+                          <div 
+                              className={`custom-tooltip ${isHovered ? 'show' : ''}`}
+                              onMouseEnter={handleHover}
+                              onMouseLeave={handleMouseLeave}>
+                              !
+                              {isHovered && <div className="tooltip-content">Går ut snart</div>}
+                           </div>
+                           </td>
+                          ) :expired(row.expiration_date) ? (
+                            <div className={`custom-tooltip ${isHovered ? 'show' : ''}`}
+                            onMouseEnter={handleHover}
+                            onMouseLeave={handleMouseLeave}>
+                            !
+                            {isHovered && <div className="tooltip-content">Utgången</div>}
+                            </div>
+                          ):(<div></div>)}
+                        <td>{row.name}
+                        </td>
                         <td>{row.expiration_date}</td>
                         <td>{row.lot_nbr}</td>
                         <td> 
                            <button
                               className="button-remove"
                               onClick={() => deleteItem(row.name, row.expiration_date, row.lot_nbr)}
-                            >
-                              X
-                            </button>
+                            > X </button>
                           </td>
                         {/*<td>{row.product_code}</td>*/}
                         {/*<td>{row.serial_number}</td>*/}

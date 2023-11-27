@@ -184,7 +184,6 @@
   width: 25px;
   border-radius: 20px;
   border: 4px;
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   font-size: 20px; 
   transition: background-color 0.1s;
 }
@@ -203,4 +202,26 @@ table {
   font-weight: bold;
 }
 
-  
+.custom-tooltip {
+  position: relative;
+  display: inline-block;
+  padding: 5px;
+  border: 1px double #ff0000;
+  margin: 1px;
+  font-size: large;
+  border-radius: 50px;
+}
+
+
+.tooltip-content {
+  position: absolute;
+  top: -20%;
+  left: 500%;
+  background-color: yellow;
+  padding: 1px;
+  border: 1px solid #ccc;
+}
+
+.custom-tooltip.show .tooltip-content {
+  display: block;
+}
