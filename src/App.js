@@ -43,56 +43,93 @@ function sortByMonth(data) {
   );
 }
 
-function App() {
 
+
+function App() {
+  const [added, setAdded] = useState('');
+  const [removed, setRemoved] = useState('');
+
+  const [avdelning, setAvdelning] = useState('');
+
+  const[buttonPopup, setButtonPopup] = useState(false);
+  const[removeButtonPopup, setRemoveButtonPopup] = useState(false);
+
+  const [manName, setManName] = useState('');
+  const [manDate, setManDate] = useState('');
+  const [manLot, setManLot] = useState('');
+  const [manAvdelning, setManAvdelning] = useState('');
+
+  const [removeGtin, setRemoveGtin] = useState('');
+  const [removeExpiry, setRemoveExpiry] = useState('');
+  const [removeLot, setRemoveLot] = useState('');
+
+  const [medDataArray, setMedDataArray] = useState([]);
+  console.log(fakeData);
+
+  React.useEffect(() => {
+    (async () => {
+      const medData = await getMedData();
+      setMedDataArray(medData);
+    })();
+  }, [added, removed])
+
+  // const fs = require('fs');
+
+  // fs.writeFile('src/data.json', JSON.stringify(JSON.stringify(medDataArray)), (err) => {
+  //       if (err) {
+  //         console.error('Error writing to JSON file:', err);
+  //       } else {
+  //         console.log('Data written to JSON file successfully.');
+  //       }
+  //   });
+
+  //const data = React.useMemo(() => JSON.stringify(medDataArray), []);
+  //Dataset från JSON
   const [searchTerm, setSearchTerm] = useState('');
   const isSearchTermEmpty = searchTerm.trim() === '';
 
   console.log(fakeData);
   getMedData();
-  const data = React.useMemo(() => fakeData, []);
+  // const data = React.useMemo(() => fakeData, []);
   //Dataset från JSON
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: "ID",
-        accessor: "id",
-      },
-      {
-        Header: "Namn på läkemedel",
-        accessor: "name",
-      },
-      {
-        Header: "Utgångsdatum",
-        accessor: "expiration_date",
-      },
-      {
-        Header: "LOT-nummer",
-        accessor: "lot_nbr",
-      },
-      {
-        Header: "Produktkod",
-        accessor: "product_code",
-      },
-      {
-        Header: "Serienummer",
-        accessor: "serial_number",
-      },
-    ],
-    []
-  );
+  // const columns = React.useMemo(
+  //   () => [
+  //     {
+  //       Header: "ID",
+  //       accessor: "section",
+  //     },
+  //     {
+  //       Header: "Namn på läkemedel",
+  //       accessor: "gtin",
+  //     },
+  //     {
+  //       Header: "Utgångsdatum",
+  //       accessor: "expiry",
+  //     },
+  //     {
+  //       Header: "LOT-nummer",
+  //       accessor: "lot",
+  //     },
+  //     {
+  //       Header: "Serienummer",
+  //       accessor: "serial",
+  //     },
+  //   ],
+  //   []
+  // );
 
   //const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
    //useTable({ columns, data }, useGroupBy);
 
   const dataWithMonth = React.useMemo(() => {
-    const rawData = fakeData.map((row) => ({
+    console.log('medDataArray: ', medDataArray);
+    const rawData = medDataArray.map((row) => ({
       ...row,
       month: getMonthFromDate(row.expiration_date),
     }));
     //Checka om det finns searchTerm, if(searchterm hittas i antingingen namn eller batch-rader), om inget hittas, skriv ut allt
     return sortByMonth(rawData);
-  }, []);
+  }, [medDataArray]);
 
   // Gruppera alla rader i månads-avsnitt
   const groupedData = dataWithMonth.reduce((acc, row) => {
@@ -111,8 +148,8 @@ function App() {
 
 // Filtrera raderna efter antingen läkemedelsnamn eller lot-nummer
 const filteredRows = dataWithMonth.filter((row) =>
-(row.name.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
-  row.lot_nbr.toLowerCase().includes(searchTerm.trim().toLowerCase()))
+(row.gtin.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
+  row.lot.toLowerCase().includes(searchTerm.trim().toLowerCase()))
 );
 
 // Gruppen omstruktureras med filtrerade rader
@@ -133,18 +170,6 @@ const filteredGroupedRows = Object.entries(filteredGroupedData).map(
 );
 const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
   //Datan ovanför söks igenom  i sökfunktion
-
-  
-  const [avdelning, setAvdelning] = useState('');
-
-  const[buttonPopup, setButtonPopup] = useState(false);
-
-  const [manName, setManName] = useState('');
-  const [manDate, setManDate] = useState('');
-  const [manLot, setManLot] = useState('');
-  const [manAvdelning, setManAvdelning] = useState('');
-  
-  const [added, setAdded] = useState('');
 
   const options = [ //Avdelnings drop down meny
     {label: "Alla Avdelningar", value: "all"},
@@ -172,15 +197,22 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
   }
 
   function addManually(){ //Skicka manName, manDate, manLot, manAvdelning till databas
+    console.log('add manually');
     setButtonPopup(true);
+    console.log(buttonPopup);
   }
   
   function submitManually(){
     setAdded("Tilläggning lyckades");
     submitScannedItem(manName, manDate, manLot, manAvdelning);
+    setManName('');
   }
   function removeManually(){
-    setAdded("Borttagning lyckades");
+    setRemoveButtonPopup(true);
+  }
+  function confirmRemoveManually(){
+    setRemoved("Borttagning lyckades");
+    deleteItem(removeGtin, removeExpiry, removeLot);
 
   }
 
@@ -263,13 +295,13 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
                         }}
                       >
                         {/*<td>{row.id}</td>*/}
-                        <td>{row.name}</td>
-                        <td>{row.expiration_date}</td>
-                        <td>{row.lot_nbr}</td>
+                        <td>{row.gtin}</td>
+                        <td>{row.expiry}</td>
+                        <td>{row.lot}</td>
                         <td> 
                            <button
                               className="button-remove"
-                              onClick={() => deleteItem(row.name, row.expiration_date, row.lot_nbr)}
+                              onClick={() => {removeManually(); setRemoveGtin(row.gtin); setRemoveExpiry(row.expiry); setRemoveLot(row.lot);}}            
                             >
                               X
                             </button>
@@ -284,6 +316,7 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
             </table>
           </div>
         </div>
+        
       </div>
 
       {isComputer ?
@@ -294,7 +327,7 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
             <input
               className="manual-input"
               placeholder="Läkemedelsnamn"
-              onChange={(e) => {setManName(e.target.value); setAdded("")}}              
+              onChange={(e) => {setManName(e.target.value); setAdded(""); setRemoved("")}}              
             />
             <input
               className="manual-input"
@@ -319,13 +352,21 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
         </div>
       : [] }  
 
-      <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually}>
+      <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually} confirmButtonText="Lägg till">
         <h3>Lägg till:</h3>
         <p>Läkemedelsnamn: {manName}</p>
         <p>Utgångsdatum: {manDate}</p>
-        <p>Batch nr: {manLot}</p>
+        <p>Batch-nr: {manLot}</p>
         <p>Avdelning: {manAvdelning}</p>
       </Popup>
+      
+      <Popup trigger={removeButtonPopup} setTrigger={setRemoveButtonPopup} setManually={confirmRemoveManually} confirmButtonText="Ta bort">
+        <h3>Ta bort:</h3>
+        <p> Läkemedelsnamn: {removeGtin}</p>
+        <p> Utgångsdatum: {removeExpiry}</p>
+        <p> Batch-nr: {removeLot}</p>
+      </Popup>
+      
     </div>
   );
 }
