@@ -213,13 +213,23 @@ table {
 }
 
 
-.tooltip-content {
+.expired-tooltip-content {
   position: absolute;
-  top: -20%;
+  top: 10%;
   left: 500%;
-  background-color: yellow;
+  background-color: rgb(255, 179, 0);
   padding: 1px;
-  border: 1px solid #ccc;
+
+}
+
+.expiring-tooltip-content {
+  position: absolute;
+  width:100px;
+  top: 10%;
+  left: 500%;
+  background-color: rgb(246, 255, 0);
+  padding: 1px;
+  
 }
 
 .custom-tooltip.show .tooltip-content {

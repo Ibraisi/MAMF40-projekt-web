@@ -5,7 +5,7 @@
         "expiration_date": "2023-01-31",
         "lot_nbr": "12345",
         "product_code": "ABC123",
-        "serial_number": "SN001"
+        "section": "hjärt och lung"
     },
     {
         "id": 2,
@@ -13,7 +13,7 @@
         "expiration_date": "2024-05-15",
         "lot_nbr": "67890",
         "product_code": "DEF456",
-        "serial_number": "SN002"
+        "section": "hjärt och lung"
     },
     {
         "id": 3,
@@ -21,7 +21,7 @@
         "expiration_date": "2023-05-20",
         "lot_nbr": "54321",
         "product_code": "GHI789",
-        "serial_number": "SN003"
+        "section": "hjärt och lung"
     },
     {
         "id": 4,
@@ -29,7 +29,7 @@
         "expiration_date": "2024-03-08",
         "lot_nbr": "98765",
         "product_code": "JKL012",
-        "serial_number": "SN004"
+        "section": "hjärt och lung"
     },
     {
         "id": 5,
@@ -37,7 +37,7 @@
         "expiration_date": "2024-07-30",
         "lot_nbr": "45678",
         "product_code": "MNO345",
-        "serial_number": "SN005"
+        "section": "Akut"
     },
     {
         "id": 6,
@@ -45,7 +45,7 @@
         "expiration_date": "2023-11-25",
         "lot_nbr": "34567",
         "product_code": "PQR678",
-        "serial_number": "SN006"
+        "section": "Akut"
     },
     {
         "id": 7,
@@ -53,7 +53,7 @@
         "expiration_date": "2024-02-12",
         "lot_nbr": "87654",
         "product_code": "STU901",
-        "serial_number": "SN007"
+        "section": "Akut"
     },
     {
         "id": 8,
@@ -61,7 +61,7 @@
         "expiration_date": "2024-08-10",
         "lot_nbr": "23456",
         "product_code": "VWX234",
-        "serial_number": "SN008"
+        "section": "Akut"
     },
     {
         "id": 9,
@@ -69,7 +69,7 @@
         "expiration_date": "2023-09-05",
         "lot_nbr": "76543",
         "product_code": "YZA567",
-        "serial_number": "SN009"
+        "section": "SN009"
     },
     {
         "id": 10,
@@ -77,7 +77,7 @@
         "expiration_date": "2024-05-18",
         "lot_nbr": "65432",
         "product_code": "BCD890",
-        "serial_number": "SN010"
+        "section": "Akut"
     },
     {
         "id": 11,
@@ -85,7 +85,7 @@
         "expiration_date": "2023-12-15",
         "lot_nbr": "112233",
         "product_code": "EFG456",
-        "serial_number": "SN011"
+        "section": "SN011"
     },
     {
         "id": 12,
@@ -93,7 +93,7 @@
         "expiration_date": "2024-06-22",
         "lot_nbr": "445566",
         "product_code": "HIJ789",
-        "serial_number": "SN012"
+        "section": "SN012"
     },
     {
         "id": 13,
@@ -101,7 +101,7 @@
         "expiration_date": "2023-06-30",
         "lot_nbr": "778899",
         "product_code": "KLM012",
-        "serial_number": "SN013"
+        "section": "Akut"
     },
     {
         "id": 14,
@@ -109,7 +109,7 @@
         "expiration_date": "2024-04-05",
         "lot_nbr": "990011",
         "product_code": "NOP345",
-        "serial_number": "SN014"
+        "section": "Akut"
     },
     {
         "id": 15,
@@ -117,7 +117,7 @@
         "expiration_date": "2024-09-28",
         "lot_nbr": "223344",
         "product_code": "QRS678",
-        "serial_number": "SN015"
+        "section": "Akut"
     },
     {
         "id": 16,
@@ -125,7 +125,7 @@
         "expiration_date": "2023-12-01",
         "lot_nbr": "556677",
         "product_code": "TUV901",
-        "serial_number": "SN016"
+        "section": "Akut"
     },
     {
         "id": 17,
@@ -133,7 +133,7 @@
         "expiration_date": "2024-03-20",
         "lot_nbr": "889900",
         "product_code": "WXY234",
-        "serial_number": "SN017"
+        "section": "Barn och Ungdom"
     },
     {
         "id": 18,
@@ -141,7 +141,7 @@
         "expiration_date": "2024-10-15",
         "lot_nbr": "112233",
         "product_code": "ZAB567",
-        "serial_number": "SN018"
+        "section": "Akut"
     },
     {
         "id": 19,
@@ -149,7 +149,7 @@
         "expiration_date": "2023-10-08",
         "lot_nbr": "445566",
         "product_code": "BCD890",
-        "serial_number": "SN019"
+        "section": "Akut"
     },
     {
         "id": 20,
@@ -157,6 +157,6 @@
         "expiration_date": "2024-05-25",
         "lot_nbr": "778899",
         "product_code": "EFG123",
-        "serial_number": "SN020"
+        "section": "Barn och Ungdom"
     }
 ]

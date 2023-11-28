@@ -13,11 +13,6 @@ function getMonthFromDate(dateString) {
   const month = date.getMonth() + 1; //Returnerar ett heltal som representerar utgångsdatumets månad
   return month;
 }
-function getYearFromDate(dateString) {
-  const date = new Date(dateString);
-  const year = date.getFullYear; //Returnerar ett heltal som representerar utgångsdatumets år
-  return year;
-}
 
 //Hämtar namnet på månaden baserat på siffran från getMonthFromDate, kontrollerar om siffran är giltig
 function getMonthNameFromNumber(monthNumber) {
@@ -45,7 +40,7 @@ function getMonthNameFromNumber(monthNumber) {
 function sortByMonth(data) {
   return data.sort(
     (a, b) =>
-      getMonthFromDate(a.expiration_date) - getMonthFromDate(b.expiration_date)
+      new Date(a.expiration_date) - new Date(b.expiration_date)
   );
 }
 const currentDate = new Date();
@@ -73,6 +68,26 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const isSearchTermEmpty = searchTerm.trim() === '';
 
+  //--------------------- VAL AV AVDELNING --------------------------- 
+  const [avdelning, setAvdelning] = useState("all");
+
+  const options = [ //Avdelnings drop down meny
+    {label: "Alla Avdelningar", value: "all"},
+    {label: "hjärt och lung", value: "hjärt och lung"},
+    {label: "Akut", value: "akut"},
+    {label: "Barn och Ungdom", value: "barn"},
+  ]
+
+  const optionsAdd = [ //Avdelnings drop down meny
+    {label: "hjärt och lung", value: "heart"},
+    {label: "Akut", value: "akut"},
+    {label: "Barn och Ungdom", value: "barn"},
+  ]
+  
+  const IsSectionSelected = avdelning.trim() === 'all';
+  //--------------------- ENDOF VAL AV AVDELNING --------------------------- 
+
+
   console.log(fakeData);
   const data = React.useMemo(() => fakeData, []);
   //Dataset från JSON
@@ -99,8 +114,8 @@ function App() {
         accessor: "product_code",
       },
       {
-        Header: "Serienummer",
-        accessor: "serial_number",
+        Header: "Avdelning",
+        accessor: "section",
       },
     ],
     []
@@ -109,7 +124,7 @@ function App() {
   //const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
    //useTable({ columns, data }, useGroupBy);
 
-   
+  //--------------------- DATAHANTERING OCH UPPDELNING--------------------------- 
   const dataWithMonth = React.useMemo(() => {
     const rawData = fakeData.map((row) => ({
       ...row,
@@ -138,8 +153,11 @@ function App() {
 
 // Filtrera raderna efter antingen läkemedelsnamn eller lot-nummer
 const filteredRows = dataWithMonth.filter((row) =>
-(row.name.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
-  row.lot_nbr.toLowerCase().includes(searchTerm.trim().toLowerCase()))
+(
+  row.section.toLowerCase().includes(avdelning.trim().toLowerCase()) && (
+  row.name.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
+  row.lot_nbr.toLowerCase().includes(searchTerm.trim().toLowerCase())||
+  row.expiration_date.toLowerCase().includes(searchTerm.trim().toLowerCase())))
 );
 
 // Gruppen omstruktureras med filtrerade rader
@@ -158,8 +176,10 @@ const filteredGroupedRows = Object.entries(filteredGroupedData).map(
   rows,
 })
 );
-const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
-  //Datan ovanför söks igenom  i sökfunktion
+const filterChoice =  isSearchTermEmpty  ? groupedRows : filteredGroupedRows;
+  
+
+ //--------------------- END OF DATAHANTERING OCH UPPDELNING--------------------------- 
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -171,29 +191,16 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
     setIsHovered(false);
   };
   
-  const [avdelning, setAvdelning] = useState('');
-
+  
   const[buttonPopup, setButtonPopup] = useState(false);
 
   const [manName, setManName] = useState('');
   const [manDate, setManDate] = useState('');
   const [manLot, setManLot] = useState('');
   const [manAvdelning, setManAvdelning] = useState('');
-  
   const [added, setAdded] = useState('');
 
-  const options = [ //Avdelnings drop down meny
-    {label: "Alla Avdelningar", value: "all"},
-    {label: "hjärt och lung", value: "heart"},
-    {label: "Akut", value: "akut"},
-    {label: "Barn och Ungdom", value: "barn"},
-  ]
-
-  const optionsAdd = [ //Avdelnings drop down meny
-    {label: "hjärt och lung", value: "heart"},
-    {label: "Akut", value: "akut"},
-    {label: "Barn och Ungdom", value: "barn"},
-  ]
+  
 
   const isComputer = window.innerWidth >= 500; //kollar om det är dator, 
 
@@ -262,9 +269,10 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
               <tbody>
 
                 {/*Om sökfönster är tomt, renderea som vanligt, annars rendererar man bara de sökninens träffar
-                 baserat på läkemedelsnamn eller LOT-nummer. filterChoice sätts beroende på sökrutans inehåll*/}
+                 baserat på läkemedelsnamn, datum eller LOT-nummer. filterChoice sätts beroende på sökrutan och/eller drop-downs inehåll*/}
                 
                 {(filterChoice.map(({month, rows}) => (
+                
                   <React.Fragment key={month}>
                     <tr
                       style={{
@@ -311,7 +319,7 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
                               onMouseEnter={handleHover}
                               onMouseLeave={handleMouseLeave}>
                               !
-                              {isHovered && <div className="tooltip-content">Går ut snart</div>}
+                              {isHovered && <div className="expiring-tooltip-content">Går ut snart</div>}
                            </div>
                            </td>
                           ) :expired(row.expiration_date) ? (
@@ -319,7 +327,7 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
                             onMouseEnter={handleHover}
                             onMouseLeave={handleMouseLeave}>
                             !
-                            {isHovered && <div className="tooltip-content">Utgången</div>}
+                            {isHovered && <div className="expired-tooltip-content">Utgången</div>}
                             </div>
                           ):(<div></div>)}
                         <td>{row.name}
