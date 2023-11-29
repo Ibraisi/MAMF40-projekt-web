@@ -203,7 +203,7 @@ table {
 }
 
 .custom-tooltip {
-  position: relative;
+  position:relative;
   display: inline-block;
   padding: 5px;
   border: 1px double #ff0000;
@@ -224,12 +224,11 @@ table {
 
 .expiring-tooltip-content {
   position: absolute;
-  width:100px;
+  width:max-content;
   top: 10%;
   left: 500%;
   background-color: rgb(246, 255, 0);
   padding: 1px;
-  
 }
 
 .custom-tooltip.show .tooltip-content {

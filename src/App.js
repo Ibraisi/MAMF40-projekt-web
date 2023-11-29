@@ -3,17 +3,16 @@ import fakeData from "./mock_data.json";
 import React, { useState } from "react";
 import Popup from './components/popup';
 //import { useTable, useGroupBy } from "react-table";
-import { validateSection, submitScannedItems, parseItemData, submitScannedItem, deleteItem } from './handles/firebaseHandler';
+import { validateSection, getMedData, parseItemData, submitScannedItem, deleteItem } from './handles/firebaseHandler';
  
 
 
-//Funktion för hämtning av månad från "expiration_date"
+//Funktion för hämtning av månad från "expiry"
 function getMonthFromDate(dateString) {
   const date = new Date(dateString);
   const month = date.getMonth() + 1; //Returnerar ett heltal som representerar utgångsdatumets månad
   return month;
 }
-
 //Hämtar namnet på månaden baserat på siffran från getMonthFromDate, kontrollerar om siffran är giltig
 function getMonthNameFromNumber(monthNumber) {
   const months = [
@@ -40,7 +39,7 @@ function getMonthNameFromNumber(monthNumber) {
 function sortByMonth(data) {
   return data.sort(
     (a, b) =>
-      new Date(a.expiration_date) - new Date(b.expiration_date)
+      getMonthFromDate(a.expiry) - getMonthFromDate(b.expiry) //SORT SKA SKE EFTER LOT-NUMMER
   );
 }
 const currentDate = new Date();
@@ -50,9 +49,9 @@ function expireSoon(insertedDate){
 
   const timeDifference = inputDate.getTime() - currentDate.getTime();
 
-  const twoWeeksInMilliseconds = 2 * 7 * 24 * 60 * 60 * 1000;
+  const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000; 
 
-  return timeDifference >= 0 && timeDifference <= twoWeeksInMilliseconds;
+  return timeDifference >= 0 && timeDifference <= oneWeekInMilliseconds;
 }
 
 function expired(insertedDate){
@@ -63,101 +62,172 @@ function expired(insertedDate){
   return timeDifference <= 0;
 }
 
+function daysUntilExpires(insertedDate){
+  const inputDate = new Date(insertedDate);
+
+  const timeDifference = inputDate.getTime() - currentDate.getTime();
+
+  const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+
+  return daysDifference;
+}
+
 function App() {
 
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleHover = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
+  
+
+  const [added, setAdded] = useState('');
+  const [removed, setRemoved] = useState('');
+
+  const [avdelning, setAvdelning] = useState('');
+
+  const[buttonPopup, setButtonPopup] = useState(false);
+  const[removeButtonPopup, setRemoveButtonPopup] = useState(false);
+
+  const [manName, setManName] = useState('');
+  const [manDate, setManDate] = useState('');
+  const [manLot, setManLot] = useState('');
+  const [manAvdelning, setManAvdelning] = useState('');
+
+  const [removeGtin, setRemoveGtin] = useState('');
+  const [removeExpiry, setRemoveExpiry] = useState('');
+  const [removeLot, setRemoveLot] = useState('');
+
+  const [medDataArray, setMedDataArray] = useState([]);
+  console.log(fakeData);
+
+  React.useEffect(() => {
+    (async () => {
+      const medData = await getMedData();
+      setMedDataArray(medData);
+    })();
+  }, [added, removed])
+
+  // const fs = require('fs');
+
+  // fs.writeFile('src/data.json', JSON.stringify(JSON.stringify(medDataArray)), (err) => {
+  //       if (err) {
+  //         console.error('Error writing to JSON file:', err);
+  //       } else {
+  //         console.log('Data written to JSON file successfully.');
+  //       }
+  //   });
+
+  //const data = React.useMemo(() => JSON.stringify(medDataArray), []);
+  //Dataset från JSON
   const [searchTerm, setSearchTerm] = useState('');
   const isSearchTermEmpty = searchTerm.trim() === '';
 
-  //--------------------- VAL AV AVDELNING --------------------------- 
-  const [avdelning, setAvdelning] = useState("all");
-
-  const options = [ //Avdelnings drop down meny
-    {label: "Alla Avdelningar", value: "all"},
-    {label: "hjärt och lung", value: "hjärt och lung"},
-    {label: "Akut", value: "akut"},
-    {label: "Barn och Ungdom", value: "barn"},
-  ]
-
-  const optionsAdd = [ //Avdelnings drop down meny
-    {label: "hjärt och lung", value: "heart"},
-    {label: "Akut", value: "akut"},
-    {label: "Barn och Ungdom", value: "barn"},
-  ]
-  
-  const IsSectionSelected = avdelning.trim() === 'all';
-  //--------------------- ENDOF VAL AV AVDELNING --------------------------- 
-
-
   console.log(fakeData);
-  const data = React.useMemo(() => fakeData, []);
+  getMedData();
+  // const data = React.useMemo(() => fakeData, []);
   //Dataset från JSON
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: "ID",
-        accessor: "id",
-      },
-      {
-        Header: "Namn på läkemedel",
-        accessor: "name",
-      },
-      {
-        Header: "Utgångsdatum",
-        accessor: "expiration_date",
-      },
-      {
-        Header: "LOT-nummer",
-        accessor: "lot_nbr",
-      },
-      {
-        Header: "Produktkod",
-        accessor: "product_code",
-      },
-      {
-        Header: "Avdelning",
-        accessor: "section",
-      },
-    ],
-    []
-  );
+  // const columns = React.useMemo(
+  //   () => [
+  //     {
+  //       Header: "ID",
+  //       accessor: "section",
+  //     },
+  //     {
+  //       Header: "Namn på läkemedel",
+  //       accessor: "gtin",
+  //     },
+  //     {
+  //       Header: "Utgångsdatum",
+  //       accessor: "expiry",
+  //     },
+  //     {
+  //       Header: "LOT-nummer",
+  //       accessor: "lot",
+  //     },
+  //     {
+  //       Header: "Serienummer",
+  //       accessor: "serial",
+  //     },
+  //   ],
+  //   []
+  // );
 
   //const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
    //useTable({ columns, data }, useGroupBy);
 
-  //--------------------- DATAHANTERING OCH UPPDELNING--------------------------- 
+
+
+//--------------------- VAL AV AVDELNING --------------------------- 
+const options = [ //Avdelnings drop down meny
+{label: "Alla Avdelningar", value: "N/A"},
+{label: "Hjärt och lung", value: "heart"},
+{label: "Akut", value: "akut"},
+{label: "Barn och Ungdom", value: "barn"},
+]
+
+const optionsAdd = [ //Avdelnings drop down meny
+{label: "Hjärt och lung", value: "heart"},
+{label: "Akut", value: "akut"},
+{label: "Barn och Ungdom", value: "barn"},
+]
+
+const isComputer = window.innerWidth >= 500; //kollar om det är dator, 
+
+function handleSelect(event){ //Sätter in värdet i avdelning från vald i drop down
+setAvdelning(event.target.value);
+setAdded("");
+}
+
+const isSectionSelected = avdelning.trim() === 'N/A';
+//--------------------- ENDOF VAL AV AVDELNING --------------------------------- 
+
+//--------------------- UPPDELNING AV DATA I SEGMENT + SÖKNING --------------------------- 
   const dataWithMonth = React.useMemo(() => {
-    const rawData = fakeData.map((row) => ({
+    console.log('medDataArray: ', medDataArray);
+    const rawData = medDataArray.map((row) => ({
       ...row,
-      month: getMonthFromDate(row.expiration_date),
+      month: getMonthFromDate(row.expiry),
     }));
     //Checka om det finns searchTerm, if(searchterm hittas i antingingen namn eller batch-rader), om inget hittas, skriv ut allt
     return sortByMonth(rawData);
-  }, []);
+  }, [medDataArray]);
 
   // Gruppera alla rader i månads-avsnitt
   const groupedData = dataWithMonth.reduce((acc, row) => {
-    const {month} = row;
-    const key = {month};
+    const month = row.month;
     if (!acc[month]) {
       acc[month] = [];
     }
     acc[month].push(row);
     return acc;
   }, {});
-  
 
   const groupedRows = Object.entries(groupedData).map(([month, rows]) => ({
     month,
     rows,
   }));
 
-// Filtrera raderna efter antingen läkemedelsnamn eller lot-nummer
-const filteredRows = dataWithMonth.filter((row) =>
-(
-  row.section.toLowerCase().includes(avdelning.trim().toLowerCase()) && (
-  row.name.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
-  row.lot_nbr.toLowerCase().includes(searchTerm.trim().toLowerCase())||
-  row.expiration_date.toLowerCase().includes(searchTerm.trim().toLowerCase())))
+ 
+
+
+
+// Filtrera raderna baserat på avdelning (section)
+const sectionFilteredRows = dataWithMonth.filter((row) => 
+  row.section.toLowerCase().includes(avdelning.trim().toLowerCase())
+);
+
+// Filtrera de section-filtrerade raderna baserat på sökterm
+const filteredRows = sectionFilteredRows.filter((row) =>
+  (
+    row.expiry.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
+    row.gtin.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
+    row.lot.toLowerCase().includes(searchTerm.trim().toLowerCase())
+  )
 );
 
 // Gruppen omstruktureras med filtrerade rader
@@ -176,38 +246,10 @@ const filteredGroupedRows = Object.entries(filteredGroupedData).map(
   rows,
 })
 );
-const filterChoice =  isSearchTermEmpty  ? groupedRows : filteredGroupedRows;
-  
+const filterChoice = isSectionSelected ? groupedRows : filteredGroupedRows;
+  //Datan ovanför söks igenom  i sökfunktion
 
- //--------------------- END OF DATAHANTERING OCH UPPDELNING--------------------------- 
-
-  const [isHovered, setIsHovered] = useState(false);
-
-  const handleHover = () => {
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
-  
-  
-  const[buttonPopup, setButtonPopup] = useState(false);
-
-  const [manName, setManName] = useState('');
-  const [manDate, setManDate] = useState('');
-  const [manLot, setManLot] = useState('');
-  const [manAvdelning, setManAvdelning] = useState('');
-  const [added, setAdded] = useState('');
-
-  
-
-  const isComputer = window.innerWidth >= 500; //kollar om det är dator, 
-
-  function handleSelect(event){ //Sätter in värdet i avdelning från vald i drop down
-    setAvdelning(event.target.value);
-    setAdded("");
-  }
+//--------------------- ENDOF UPPDELNING AV DATA I SEGMENT + SÖKNING --------------------------- 
 
   function manHandleSelect(event){ //Sätter in värdet i manAvdelning från vald i drop down för manuell tilläggning
     setManAvdelning(event.target.value);
@@ -215,7 +257,9 @@ const filterChoice =  isSearchTermEmpty  ? groupedRows : filteredGroupedRows;
   }
 
   function addManually(){ //Skicka manName, manDate, manLot, manAvdelning till databas
+    console.log('add manually');
     setButtonPopup(true);
+    console.log(buttonPopup);
   }
   
   function submitManually(){
@@ -223,7 +267,12 @@ const filterChoice =  isSearchTermEmpty  ? groupedRows : filteredGroupedRows;
     submitScannedItem(manName, manDate, manLot, manAvdelning);
   }
   function removeManually(){
-    setAdded("Borttagning lyckades");
+    setRemoveButtonPopup(true);
+  }
+  function confirmRemoveManually(){
+    setRemoved("Borttagning lyckades");
+    deleteItem(removeGtin, removeExpiry, removeLot);
+    
   }
 
   // Render the table
@@ -269,10 +318,8 @@ const filterChoice =  isSearchTermEmpty  ? groupedRows : filteredGroupedRows;
               <tbody>
 
                 {/*Om sökfönster är tomt, renderea som vanligt, annars rendererar man bara de sökninens träffar
-                 baserat på läkemedelsnamn, datum eller LOT-nummer. filterChoice sätts beroende på sökrutan och/eller drop-downs inehåll*/}
-                
-                {(filterChoice.map(({month, rows}) => (
-                
+                 baserat på läkemedelsnamn eller LOT-nummer. filterChoice sätts beroende på sökrutans inehåll*/}
+                {(filterChoice.map(({ month, rows }) => (
                   <React.Fragment key={month}>
                     <tr
                       style={{
@@ -292,7 +339,7 @@ const filterChoice =  isSearchTermEmpty  ? groupedRows : filteredGroupedRows;
                         border: "1px solid #000",
                       }}
                     >
-                      <th></th>
+                      <th>Status</th>
                       <th>Namn på läkemedel</th>
                       <th>Utgångsdatum</th>
                       <th>LOT-nummer</th>
@@ -300,45 +347,44 @@ const filterChoice =  isSearchTermEmpty  ? groupedRows : filteredGroupedRows;
                       {/*<th>Serienummer</th>*/}
                     </tr>
                     {rows.map((row) => (
-                      <tr
-                        key={row.id}
-                        style={{
-                          border: "0.5px solid grey",
-                          background: expireSoon(row.expiration_date) ? "#ea6e6e" 
-                          :expired(row.expiration_date )? "#ea6e6e" 
-                          :"#fff",
-                        }}
-                      >
-                        {/*<td>{row.id}</td>*/}
-                        
-                          
-                          {expireSoon(row.expiration_date) ? (
-                          <td>
+                     <tr
+                     style={{
+                       border: "0.5px solid grey",
+                       background: 
+                        expireSoon(row.expiry) ? "Orange" 
+                        :expired(row.expiry )? "#ea6e6e" 
+                        :"#fff",
+                     }}
+                   >
+                        <td>
+                        {expireSoon(row.expiry) ? (
                           <div 
                               className={`custom-tooltip ${isHovered ? 'show' : ''}`}
                               onMouseEnter={handleHover}
                               onMouseLeave={handleMouseLeave}>
                               !
-                              {isHovered && <div className="expiring-tooltip-content">Går ut snart</div>}
+                              {isHovered && <div className="expiring-tooltip-content">Går ut om {daysUntilExpires(row.expiry)} dagar</div>}
                            </div>
-                           </td>
-                          ) :expired(row.expiration_date) ? (
-                            <div className={`custom-tooltip ${isHovered ? 'show' : ''}`}
+                          ):expired(row.expiry) ? (
+                            <div 
+                            className={`custom-tooltip ${isHovered ? 'show' : ''}`}
                             onMouseEnter={handleHover}
                             onMouseLeave={handleMouseLeave}>
                             !
                             {isHovered && <div className="expired-tooltip-content">Utgången</div>}
                             </div>
                           ):(<div></div>)}
-                        <td>{row.name}
                         </td>
-                        <td>{row.expiration_date}</td>
-                        <td>{row.lot_nbr}</td>
+                        <td>{row.gtin}</td>
+                        <td>{row.expiry}</td>
+                        <td>{row.lot}</td>
                         <td> 
                            <button
                               className="button-remove"
-                              onClick={() => deleteItem(row.name, row.expiration_date, row.lot_nbr)}
-                            > X </button>
+                              onClick={() => {removeManually(); setRemoveGtin(row.gtin); setRemoveExpiry(row.expiry); setRemoveLot(row.lot);}}            
+                            >
+                              X
+                            </button>
                           </td>
                         {/*<td>{row.product_code}</td>*/}
                         {/*<td>{row.serial_number}</td>*/}
@@ -360,7 +406,7 @@ const filterChoice =  isSearchTermEmpty  ? groupedRows : filteredGroupedRows;
             <input
               className="manual-input"
               placeholder="Läkemedelsnamn"
-              onChange={(e) => {setManName(e.target.value); setAdded("")}}              
+              onChange={(e) => {setManName(e.target.value); setAdded(""); setRemoved("")}}              
             />
             <input
               className="manual-input"
@@ -385,12 +431,19 @@ const filterChoice =  isSearchTermEmpty  ? groupedRows : filteredGroupedRows;
         </div>
       : [] }  
 
-      <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually}>
+      <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually} confirmButtonText="Lägg till">
         <h3>Lägg till:</h3>
         <p>Läkemedelsnamn: {manName}</p>
         <p>Utgångsdatum: {manDate}</p>
-        <p>Batch nr: {manLot}</p>
+        <p>Batch-nr: {manLot}</p>
         <p>Avdelning: {manAvdelning}</p>
+      </Popup>
+      
+      <Popup trigger={removeButtonPopup} setTrigger={setRemoveButtonPopup} setManually={confirmRemoveManually} confirmButtonText="Ta bort">
+        <h3>Ta bort:</h3>
+        <p> Läkemedelsnamn: {removeGtin}</p>
+        <p> Utgångsdatum: {removeExpiry}</p>
+        <p> Batch-nr: {removeLot}</p>
       </Popup>
     </div>
   );

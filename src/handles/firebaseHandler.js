@@ -1,6 +1,6 @@
 import { db } from "../firebase_setup/firebase"
 import { addDoc, getDocs, deleteDoc, collection, query, where, doc } from "@firebase/firestore"
-import { async } from '@firebase/util';
+//import { async } from '@firebase/util';
 import MedInformation from '../data/MedInformation.js';
  
 export const validateSection = async (sectionId) => {
@@ -23,6 +23,39 @@ export const validateSection = async (sectionId) => {
       return null;
     }
   };
+
+export const getMedData = async () => {
+    // Create query for med-data
+    const q = query(collection(db, "med-data"));
+    const fs = require('fs');
+
+    try {
+        // Execute query
+        const querySnapshot = await getDocs(q);
+        console.log("Query results:", querySnapshot.docs.map(doc => doc.data())); // Log the query results
+
+        if (!querySnapshot.empty) {
+            const document = querySnapshot.docs.map(doc => doc.data());
+            // fs.writeFile('src/data.json', JSON.stringify(document), (err) => {
+            //     if (err) {
+            //       console.error('Error writing to JSON file:', err);
+            //     } else {
+            //       console.log('Data written to JSON file successfully.');
+            //     }
+            // });
+
+            localStorage.setItem('medData', JSON.stringify(document));
+            console.log('document: ', JSON.stringify(document));
+            //return JSON.stringify(document);
+            return document;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error("Error validating section: ", error);
+        return null;
+    }
+}
 
   export const submitScannedItem = async (manName, manDate, manLot, manAvdelning) => {
     try {
