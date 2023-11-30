@@ -38,49 +38,15 @@ function getMonthNameFromNumber(monthNumber) {
 function sortByMonth(data) {
   return data.sort(
     (a, b) =>
-      getMonthFromDate(a.expiry) - getMonthFromDate(b.expiry) //SORT SKA SKE EFTER LOT-NUMMER
+      getMonthFromDate(a.expiration_date) - getMonthFromDate(b.expiration_date)
   );
-}
-const currentDate = new Date();
-
-function expireSoon(insertedDate){
-  const inputDate = new Date(insertedDate);
-
-  const timeDifference = inputDate.getTime() - currentDate.getTime();
-
-  const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000; 
-
-  return timeDifference >= 0 && timeDifference <= oneWeekInMilliseconds;
-}
-
-function expired(insertedDate){
-  const inputDate = new Date(insertedDate);
-
-  const timeDifference = inputDate.getTime() - currentDate.getTime();
-
-  return timeDifference <= 0;
-}
-
-function daysUntilExpires(insertedDate){
-  const inputDate = new Date(insertedDate);
-
-  const timeDifference = inputDate.getTime() - currentDate.getTime();
-
-  const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-
-  return daysDifference;
 }
 
 function App() {
-
-  console.log(fakeData);
-
   const [added, setAdded] = useState('');
   const [removed, setRemoved] = useState('');
 
-  
   const [avdelning, setAvdelning] = useState('');
-  const isSectionSelected = avdelning.trim() === 'N/A';
 
   const[buttonPopup, setButtonPopup] = useState(false);
   const[removeButtonPopup, setRemoveButtonPopup] = useState(false);
@@ -95,37 +61,19 @@ function App() {
   const [removeLot, setRemoveLot] = useState('');
 
   const [medDataArray, setMedDataArray] = useState([]);
-
-  const [isHovered, setIsHovered] = useState(false);
-
   console.log(fakeData);
 
+  //
   React.useEffect(() => {
     (async () => {
       const medData = await getMedData();
       setMedDataArray(medData);
     })();
-  }, [removed, added])
-
- 
-
+  }, [added, removed])
   const [searchTerm, setSearchTerm] = useState('');
-  //const isSearchTermEmpty = searchTerm.trim() === '';
+  const isSearchTermEmpty = searchTerm.trim() === '';
 
-  // const fs = require('fs');
-
-  // fs.writeFile('src/data.json', JSON.stringify(JSON.stringify(medDataArray)), (err) => {
-  //       if (err) {
-  //         console.error('Error writing to JSON file:', err);
-  //       } else {
-  //         console.log('Data written to JSON file successfully.');
-  //       }
-  //   });
-
-  //const data = React.useMemo(() => JSON.stringify(medDataArray), []);
-  //Dataset från JSON
-  
-  
+  console.log(fakeData);
   // const data = React.useMemo(() => fakeData, []);
   //Dataset från JSON
   // const columns = React.useMemo(
@@ -242,11 +190,11 @@ const options = [ //Avdelnings drop down meny
 {label: "Barn och Ungdom", value: "barn"},
 ]
 
-const optionsAdd = [ //Avdelnings drop down meny
-{label: "Hjärt och lung", value: "heart"},
-{label: "Akut", value: "akut"},
-{label: "Barn och Ungdom", value: "barn"},
-]
+  const optionsAdd = [ //Avdelnings drop down meny
+    {label: "hjärt och lung", value: "heart"},
+    {label: "Akut", value: "akut"},
+    {label: "Barn och Ungdom", value: "barn"},
+  ]
 
 //--------------------- ENDOF VAL AV AVDELNING --------------------------------- 
 
@@ -270,7 +218,7 @@ async function removeManually(){
     setAdded("");
   }
 
-  async function addManually(){ //Skicka manName, manDate, manLot, manAvdelning till databas
+  function addManually(){ //Skicka manName, manDate, manLot, manAvdelning till databas
     console.log('add manually');
     setButtonPopup(true);
     console.log(buttonPopup);
@@ -279,7 +227,16 @@ async function removeManually(){
   const submitManually = async () => {
     await submitScannedItem(manName, manDate, manLot, manAvdelning);
     setAdded("Tilläggning lyckades");
-  };
+    submitScannedItem(manName, manDate, manLot, manAvdelning);
+  }
+  function removeManually(){
+    setRemoveButtonPopup(true);
+  }
+  function confirmRemoveManually(){
+    setRemoved("Borttagning lyckades");
+    deleteItem(removeGtin, removeExpiry, removeLot);
+
+  }
 
   // Render the table
   return (
@@ -408,6 +365,7 @@ async function removeManually(){
             </table>
           </div>
         </div>
+        
       </div>
       
       {isComputer ?
@@ -443,7 +401,7 @@ async function removeManually(){
         </div>
       : [] }
 
-    <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually} confirmButtonText="Lägg till">
+      <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually}>
         <h3>Lägg till:</h3>
         <p>Läkemedelsnamn: {manName}</p>
         <p>Utgångsdatum: {manDate}</p>
@@ -457,6 +415,7 @@ async function removeManually(){
         <p> Utgångsdatum: {removeExpiry}</p>
         <p> Batch-nr: {removeLot}</p>
       </Popup>
+      
     </div>
   );
 }
