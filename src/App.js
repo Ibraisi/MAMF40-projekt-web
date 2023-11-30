@@ -6,7 +6,6 @@ import Popup from './components/popup';
 import { validateSection, getMedData, parseItemData, submitScannedItem, deleteItem } from './handles/firebaseHandler';
  
 
-
 //Funktion för hämtning av månad från "expiry"
 function getMonthFromDate(dateString) {
   const date = new Date(dateString);
@@ -74,21 +73,14 @@ function daysUntilExpires(insertedDate){
 
 function App() {
 
-  const [isHovered, setIsHovered] = useState(false);
-
-  const handleHover = () => {
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-  };
-  
+  console.log(fakeData);
 
   const [added, setAdded] = useState('');
   const [removed, setRemoved] = useState('');
 
+  
   const [avdelning, setAvdelning] = useState('');
+  const isSectionSelected = avdelning.trim() === 'N/A';
 
   const[buttonPopup, setButtonPopup] = useState(false);
   const[removeButtonPopup, setRemoveButtonPopup] = useState(false);
@@ -103,6 +95,9 @@ function App() {
   const [removeLot, setRemoveLot] = useState('');
 
   const [medDataArray, setMedDataArray] = useState([]);
+
+  const [isHovered, setIsHovered] = useState(false);
+
   console.log(fakeData);
 
   React.useEffect(() => {
@@ -110,7 +105,12 @@ function App() {
       const medData = await getMedData();
       setMedDataArray(medData);
     })();
-  }, [added, removed])
+  }, [removed, added])
+
+ 
+
+  const [searchTerm, setSearchTerm] = useState('');
+  //const isSearchTermEmpty = searchTerm.trim() === '';
 
   // const fs = require('fs');
 
@@ -124,11 +124,8 @@ function App() {
 
   //const data = React.useMemo(() => JSON.stringify(medDataArray), []);
   //Dataset från JSON
-  const [searchTerm, setSearchTerm] = useState('');
-  const isSearchTermEmpty = searchTerm.trim() === '';
-
-  console.log(fakeData);
-  getMedData();
+  
+  
   // const data = React.useMemo(() => fakeData, []);
   //Dataset från JSON
   // const columns = React.useMemo(
@@ -159,32 +156,21 @@ function App() {
 
   //const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
    //useTable({ columns, data }, useGroupBy);
+  console.log(fakeData);
 
-
-
-//--------------------- VAL AV AVDELNING --------------------------- 
-const options = [ //Avdelnings drop down meny
-{label: "Alla Avdelningar", value: "N/A"},
-{label: "Hjärt och lung", value: "heart"},
-{label: "Akut", value: "akut"},
-{label: "Barn och Ungdom", value: "barn"},
-]
-
-const optionsAdd = [ //Avdelnings drop down meny
-{label: "Hjärt och lung", value: "heart"},
-{label: "Akut", value: "akut"},
-{label: "Barn och Ungdom", value: "barn"},
-]
+   const handleHover = () => {
+     setIsHovered(true);
+   };
+ 
+   const handleMouseLeave = () => {
+     setIsHovered(false);
+   };
+   
 
 const isComputer = window.innerWidth >= 500; //kollar om det är dator, 
 
-function handleSelect(event){ //Sätter in värdet i avdelning från vald i drop down
-setAvdelning(event.target.value);
-setAdded("");
-}
 
-const isSectionSelected = avdelning.trim() === 'N/A';
-//--------------------- ENDOF VAL AV AVDELNING --------------------------------- 
+
 
 //--------------------- UPPDELNING AV DATA I SEGMENT + SÖKNING --------------------------- 
   const dataWithMonth = React.useMemo(() => {
@@ -213,9 +199,6 @@ const isSectionSelected = avdelning.trim() === 'N/A';
   }));
 
  
-
-
-
 // Filtrera raderna baserat på avdelning (section)
 const sectionFilteredRows = dataWithMonth.filter((row) => 
   row.section.toLowerCase().includes(avdelning.trim().toLowerCase())
@@ -251,29 +234,52 @@ const filterChoice = isSectionSelected ? groupedRows : filteredGroupedRows;
 
 //--------------------- ENDOF UPPDELNING AV DATA I SEGMENT + SÖKNING --------------------------- 
 
+//--------------------- VAL AV AVDELNING --------------------------- 
+const options = [ //Avdelnings drop down meny
+{label: "Alla Avdelningar", value: "N/A"},
+{label: "Hjärt och lung", value: "heart"},
+{label: "Akut", value: "akut"},
+{label: "Barn och Ungdom", value: "barn"},
+]
+
+const optionsAdd = [ //Avdelnings drop down meny
+{label: "Hjärt och lung", value: "heart"},
+{label: "Akut", value: "akut"},
+{label: "Barn och Ungdom", value: "barn"},
+]
+
+//--------------------- ENDOF VAL AV AVDELNING --------------------------------- 
+
+function handleSelect(event){ //Sätter in värdet i avdelning från vald i drop down
+  setAvdelning(event.target.value);
+  setAdded("");
+  }
+
+async function removeManually(){
+    console.log('remove manually');
+    setRemoveButtonPopup(true);
+    console.log(buttonPopup);
+  }
+  async function confirmRemoveManually() {
+    await deleteItem(removeGtin, removeExpiry, removeLot);
+    setRemoved("Borttagning lyckades");
+  }
+  
   function manHandleSelect(event){ //Sätter in värdet i manAvdelning från vald i drop down för manuell tilläggning
     setManAvdelning(event.target.value);
     setAdded("");
   }
 
-  function addManually(){ //Skicka manName, manDate, manLot, manAvdelning till databas
+  async function addManually(){ //Skicka manName, manDate, manLot, manAvdelning till databas
     console.log('add manually');
     setButtonPopup(true);
     console.log(buttonPopup);
   }
   
-  function submitManually(){
+  const submitManually = async () => {
+    await submitScannedItem(manName, manDate, manLot, manAvdelning);
     setAdded("Tilläggning lyckades");
-    submitScannedItem(manName, manDate, manLot, manAvdelning);
-  }
-  function removeManually(){
-    setRemoveButtonPopup(true);
-  }
-  function confirmRemoveManually(){
-    setRemoved("Borttagning lyckades");
-    deleteItem(removeGtin, removeExpiry, removeLot);
-    
-  }
+  };
 
   // Render the table
   return (
@@ -373,7 +379,13 @@ const filterChoice = isSectionSelected ? groupedRows : filteredGroupedRows;
                             !
                             {isHovered && <div className="expired-tooltip-content">Utgången</div>}
                             </div>
-                          ):(<div></div>)}
+                          ):(<div
+                            style ={{
+                              color:"Green",
+                            }}
+                          >
+                            ✓
+                          </div>)}
                         </td>
                         <td>{row.gtin}</td>
                         <td>{row.expiry}</td>
@@ -397,7 +409,7 @@ const filterChoice = isSectionSelected ? groupedRows : filteredGroupedRows;
           </div>
         </div>
       </div>
-
+      
       {isComputer ?
         <div className="manual-box"> {/* Div till Manuell input av läkemedel */}
           <div style={{height: "40px", width: "100%"}}><p className="textAdd">Lägg Till Manuellt</p></div>
@@ -429,9 +441,9 @@ const filterChoice = isSectionSelected ? groupedRows : filteredGroupedRows;
             <p style={{height: "20px",}}>{added}</p>
           </div>
         </div>
-      : [] }  
+      : [] }
 
-      <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually} confirmButtonText="Lägg till">
+    <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually} confirmButtonText="Lägg till">
         <h3>Lägg till:</h3>
         <p>Läkemedelsnamn: {manName}</p>
         <p>Utgångsdatum: {manDate}</p>

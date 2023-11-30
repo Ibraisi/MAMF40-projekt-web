@@ -84,7 +84,7 @@ export const getMedData = async () => {
   
       // Execute the query
       const querySnapshot = await getDocs(q);
-  
+      
       // Check if a document matching the query exists
       if (!querySnapshot.empty) {
         // Get the reference to the document
