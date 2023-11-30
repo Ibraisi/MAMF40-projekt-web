@@ -66,30 +66,17 @@ function App() {
   const [medDataArray, setMedDataArray] = useState([]);
   console.log(fakeData);
 
+  //
   React.useEffect(() => {
     (async () => {
       const medData = await getMedData();
       setMedDataArray(medData);
     })();
   }, [added, removed])
-
-  // const fs = require('fs');
-
-  // fs.writeFile('src/data.json', JSON.stringify(JSON.stringify(medDataArray)), (err) => {
-  //       if (err) {
-  //         console.error('Error writing to JSON file:', err);
-  //       } else {
-  //         console.log('Data written to JSON file successfully.');
-  //       }
-  //   });
-
-  //const data = React.useMemo(() => JSON.stringify(medDataArray), []);
-  //Dataset från JSON
   const [searchTerm, setSearchTerm] = useState('');
   const isSearchTermEmpty = searchTerm.trim() === '';
 
   console.log(fakeData);
-  getMedData();
   // const data = React.useMemo(() => fakeData, []);
   //Dataset från JSON
   // const columns = React.useMemo(
@@ -300,7 +287,7 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
                         <td> 
                            <button
                               className="button-remove"
-                              onClick={() => {removeManually(); setRemoveGtin(row.gtin); setRemoveExpiry(row.expiry); setRemoveLot(row.lot);}}            
+                              onClick={() => {removeManually(); setRemoveGtin(row.gtin); setRemoveExpiry(row.expiry); setRemoveLot(row.lot); setRemoved("");}}            
                             >
                               X
                             </button>
@@ -326,7 +313,7 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
             <input
               className="manual-input"
               placeholder="Läkemedelsnamn"
-              onChange={(e) => {setManName(e.target.value); setAdded(""); setRemoved("")}}              
+              onChange={(e) => {setManName(e.target.value); setAdded("")}}              
             />
             <input
               className="manual-input"
