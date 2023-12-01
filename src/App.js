@@ -3,7 +3,7 @@ import fakeData from "./mock_data.json";
 import React, { useState } from "react";
 import Popup from './components/popup';
 //import { useTable, useGroupBy } from "react-table";
-import { validateSection, getMedData, parseItemData, submitScannedItem, deleteItem } from './handles/firebaseHandler';
+import { getMedData, submitScannedItem, deleteItem } from './handles/firebaseHandler';
  
 
 
@@ -64,19 +64,20 @@ function App() {
   const [removeLot, setRemoveLot] = useState('');
 
   const [medDataArray, setMedDataArray] = useState([]);
-  console.log(fakeData);
+  //console.log(fakeData);
 
   //
   React.useEffect(() => {
     (async () => {
       const medData = await getMedData();
       setMedDataArray(medData);
+      console.log('rendered');
     })();
   }, [added, removed])
   const [searchTerm, setSearchTerm] = useState('');
   const isSearchTermEmpty = searchTerm.trim() === '';
 
-  console.log(fakeData);
+  //console.log(fakeData);
   // const data = React.useMemo(() => fakeData, []);
   //Dataset från JSON
   // const columns = React.useMemo(
@@ -109,7 +110,7 @@ function App() {
    //useTable({ columns, data }, useGroupBy);
 
   const dataWithMonth = React.useMemo(() => {
-    console.log('medDataArray: ', medDataArray);
+    //console.log('medDataArray: ', medDataArray);
     const rawData = medDataArray.map((row) => ({
       ...row,
       month: getMonthFromDate(row.expiration_date),
@@ -185,21 +186,26 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
 
   function addManually(){ //Skicka manName, manDate, manLot, manAvdelning till databas
     console.log('add manually');
-    setButtonPopup(true);
-    console.log(buttonPopup);
+    const inDataBase = JSON.stringify(medDataArray).toLowerCase();
+    if(!(inDataBase.includes(manName.toLowerCase()) && inDataBase.includes(manLot))){
+      setButtonPopup(true);
+    }else{
+      setAdded("Läkemedlet finns redan");
+    }
   }
   
   function submitManually(){
-    setAdded("Tilläggning lyckades");
-    submitScannedItem(manName, manDate, manLot, manAvdelning);
+      submitScannedItem(manName, manDate, manLot, manAvdelning);
+      setAdded("Tilläggning lyckades");
   }
   function removeManually(){
+    console.log('remove manually')
     setRemoveButtonPopup(true);
   }
   function confirmRemoveManually(){
-    setRemoved("Borttagning lyckades");
     deleteItem(removeGtin, removeExpiry, removeLot);
-
+    setRemoved("Borttagning lyckades");
+    setAdded("Borttagning lyckades");
   }
 
   // Render the table
@@ -287,7 +293,7 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
                         <td> 
                            <button
                               className="button-remove"
-                              onClick={() => {removeManually(); setRemoveGtin(row.gtin); setRemoveExpiry(row.expiry); setRemoveLot(row.lot); setRemoved("");}}            
+                              onClick={() => {removeManually(); setRemoveGtin(row.gtin); setRemoveExpiry(row.expiry); setRemoveLot(row.lot); setAdded(""); setRemoved("");}}            
                             >
                               X
                             </button>

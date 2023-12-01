@@ -27,8 +27,6 @@ export const validateSection = async (sectionId) => {
 export const getMedData = async () => {
     // Create query for med-data
     const q = query(collection(db, "med-data"));
-    const fs = require('fs');
-
     try {
         // Execute query
         const querySnapshot = await getDocs(q);
@@ -36,17 +34,6 @@ export const getMedData = async () => {
 
         if (!querySnapshot.empty) {
             const document = querySnapshot.docs.map(doc => doc.data());
-            // fs.writeFile('src/data.json', JSON.stringify(document), (err) => {
-            //     if (err) {
-            //       console.error('Error writing to JSON file:', err);
-            //     } else {
-            //       console.log('Data written to JSON file successfully.');
-            //     }
-            // });
-
-            localStorage.setItem('medData', JSON.stringify(document));
-            console.log('document: ', JSON.stringify(document));
-            //return JSON.stringify(document);
             return document;
         } else {
             return null;
@@ -62,7 +49,7 @@ export const getMedData = async () => {
       const medItem = new MedInformation(manName, manDate, manLot, "0", manAvdelning);
       console.log("hello from service :", {medItem});
       const parsedData = parseItemData(medItem);
-      console.log(parsedData);
+      //console.log(parsedData);
       const docRef = await addDoc(collection(db, 'med-data'), parsedData);
         console.log('Document written with ID: ', docRef.id);
     } catch (e) {
