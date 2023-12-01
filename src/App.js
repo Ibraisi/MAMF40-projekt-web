@@ -46,7 +46,7 @@ function sortByMonth(data) {
 
 
 function App() {
-  const [added, setAdded] = useState('');
+  const [message, setMessage] = useState('');
   const [removed, setRemoved] = useState('');
 
   const [avdelning, setAvdelning] = useState('');
@@ -57,14 +57,14 @@ function App() {
   const [manName, setManName] = useState('');
   const [manDate, setManDate] = useState('');
   const [manLot, setManLot] = useState('');
-  const [manAvdelning, setManAvdelning] = useState('');
+  const [manAvdelning, setManAvdelning] = useState('heart');
 
   const [removeGtin, setRemoveGtin] = useState('');
   const [removeExpiry, setRemoveExpiry] = useState('');
   const [removeLot, setRemoveLot] = useState('');
+  const [removeSection, setRemoveSection] = useState('');
 
   const [medDataArray, setMedDataArray] = useState([]);
-  //console.log(fakeData);
 
   //
   React.useEffect(() => {
@@ -73,9 +73,24 @@ function App() {
       setMedDataArray(medData);
       console.log('rendered');
     })();
-  }, [added, removed])
+  }, [message, removed])
   const [searchTerm, setSearchTerm] = useState('');
   const isSearchTermEmpty = searchTerm.trim() === '';
+
+  const sortedMedDataArray = [...medDataArray].sort((a, b) => {
+    const expiryA = a.expiry.toLowerCase();
+    const expiryB = b.expiry.toLowerCase();
+  
+    if (expiryA < expiryB) {
+      return -1;
+    }
+    if (expiryA > expiryB) {
+      return 1;
+    }
+    return 0;
+  });
+  
+  // Now, sortedMedDataArray contains the sorted data based on the expiry property
 
   //console.log(fakeData);
   // const data = React.useMemo(() => fakeData, []);
@@ -110,8 +125,7 @@ function App() {
    //useTable({ columns, data }, useGroupBy);
 
   const dataWithMonth = React.useMemo(() => {
-    //console.log('medDataArray: ', medDataArray);
-    const rawData = medDataArray.map((row) => ({
+    const rawData = sortedMedDataArray.map((row) => ({
       ...row,
       month: getMonthFromDate(row.expiration_date),
     }));
@@ -159,14 +173,14 @@ const filteredGroupedRows = Object.entries(filteredGroupedData).map(
 const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
   //Datan ovanför söks igenom  i sökfunktion
 
-  const options = [ //Avdelnings drop down meny
+  const options = [ //Avdelnings drop down meny för filtrering
     {label: "Alla Avdelningar", value: "all"},
     {label: "Hjärt och lung", value: "heart"},
     {label: "Akut", value: "akut"},
     {label: "Barn och Ungdom", value: "barn"},
   ]
 
-  const optionsAdd = [ //Avdelnings drop down meny
+  const optionsAdd = [ //Avdelnings drop down meny för manuell tilläggning
     {label: "Hjärt och lung", value: "heart"},
     {label: "Akut", value: "akut"},
     {label: "Barn och Ungdom", value: "barn"},
@@ -176,39 +190,51 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
 
   function handleSelect(event){ //Sätter in värdet i avdelning från vald i drop down
     setAvdelning(event.target.value);
-    setAdded("");
+    setMessage("");
   }
 
   function manHandleSelect(event){ //Sätter in värdet i manAvdelning från vald i drop down för manuell tilläggning
     setManAvdelning(event.target.value);
-    setAdded("");
+    setMessage("");
   }
 
-  function addManually(){ //Skicka manName, manDate, manLot, manAvdelning till databas
+  function addManually(){ //Lägg till läkemedel. Kolla så alla fält är ifyllda och att läkemedlet inte redan finns på avdelningen, visa pop-up
     console.log('add manually');
     const inDataBase = JSON.stringify(medDataArray).toLowerCase();
-    if(!(inDataBase.includes(manName.toLowerCase()) && inDataBase.includes(manLot))){
+    if(manName === "" || manDate === "" || manLot === ""){
+      setMessage("Fyll i alla fält");
+    }else{
+      var duplicate = false;
+      for (const item of medDataArray) {
+        if(item.gtin.toLowerCase() === manName.toLowerCase() && item.lot === manLot && item.section.toLowerCase() === manAvdelning.toLowerCase()){
+          duplicate = true;
+        }
+      }
+      if(!duplicate){
       setButtonPopup(true);
     }else{
-      setAdded("Läkemedlet finns redan");
-    }
+      setMessage("Läkemedlet finns redan");
+    }}
   }
   
-  function submitManually(){
+  function submitManually(){ //tilläggning bekräftad, slutför tilläggning till databas och meddela användare
       submitScannedItem(manName, manDate, manLot, manAvdelning);
-      setAdded("Tilläggning lyckades");
+      setMessage("Tilläggning lyckades");
   }
-  function removeManually(){
+  function removeManually(){//Ta bort läkemedel, visa pop-up 
     console.log('remove manually')
     setRemoveButtonPopup(true);
   }
-  function confirmRemoveManually(){
-    deleteItem(removeGtin, removeExpiry, removeLot);
-    setRemoved("Borttagning lyckades");
-    setAdded("Borttagning lyckades");
+  function confirmRemoveManually(){ //borttagning bekräftad, slutför borttagning från databas och meddela användare
+    deleteItem(removeGtin, removeExpiry, removeLot, removeSection);
+    setMessage("Borttagning lyckades");
+
+    setTimeout(() => {
+      setRemoved("");
+    }, 1000);
   }
 
-  // Render the table
+  // Rendera table
   return (
     <div className="App" >
       {/*<h1>{avdelning}</h1> test av dropdown*/}
@@ -233,7 +259,7 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
             <input 
                 className="searchBox"
                 placeholder="Sök efter Batch/Läkemedelsnamn"
-                onChange={(e) => {setSearchTerm(e.target.value); setAdded("")}} //Innuti klamrar , skapa funktion som hämtar sökt objekt från JSON-fil
+                onChange={(e) => {setSearchTerm(e.target.value); setMessage("")}} //Innuti klamrar , skapa funktion som hämtar sökt objekt från JSON-fil
               />
           </div>
         </div>
@@ -276,6 +302,7 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
                       <th>Namn på läkemedel</th>
                       <th>Utgångsdatum</th>
                       <th>LOT-nummer</th>
+                      <th>Avdelning</th>
                       {/*<th>Produktkod</th>*/}
                       {/*<th>Serienummer</th>*/}
                     </tr>
@@ -290,10 +317,11 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
                         <td>{row.gtin}</td>
                         <td>{row.expiry}</td>
                         <td>{row.lot}</td>
+                        <td>{row.section}</td>
                         <td> 
                            <button
                               className="button-remove"
-                              onClick={() => {removeManually(); setRemoveGtin(row.gtin); setRemoveExpiry(row.expiry); setRemoveLot(row.lot); setAdded(""); setRemoved("");}}            
+                              onClick={() => {removeManually(); setRemoveGtin(row.gtin); setRemoveExpiry(row.expiry); setRemoveLot(row.lot); setRemoveSection(row.section); setMessage(""); setRemoved("");}}            
                             >
                               X
                             </button>
@@ -319,17 +347,17 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
             <input
               className="manual-input"
               placeholder="Läkemedelsnamn"
-              onChange={(e) => {setManName(e.target.value); setAdded("")}}              
+              onChange={(e) => {setManName(e.target.value); setMessage("")}}              
             />
             <input
               className="manual-input"
               placeholder="Utgångsdatum(ÅÅÅÅ-MM-DD)"
-              onChange={(e) => {setManDate(e.target.value); setAdded("")}}
+              onChange={(e) => {setManDate(e.target.value); setMessage("")}}
             />
             <input
               className="manual-input"
               placeholder="Batch-nr"
-              onChange={(e) => {setManLot(e.target.value); setAdded("")}}
+              onChange={(e) => {setManLot(e.target.value); setMessage("")}}
             />
             <select className="manual-input" onChange={manHandleSelect}> {/* Dropdown meny */}
                 {optionsAdd.map(option => (
@@ -339,7 +367,7 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
             <button className="button-add"
               onClick={() => addManually()}
             >Lägg Till</button>
-            <p style={{height: "20px",}}>{added}</p>
+            <p style={{height: "20px",}}>{message}</p>
           </div>
         </div>
       : [] }  
@@ -357,6 +385,7 @@ const filterChoice = isSearchTermEmpty ? groupedRows : filteredGroupedRows;
         <p> Läkemedelsnamn: {removeGtin}</p>
         <p> Utgångsdatum: {removeExpiry}</p>
         <p> Batch-nr: {removeLot}</p>
+        <p> Avdelning: {removeSection}</p>
       </Popup>
       
     </div>
