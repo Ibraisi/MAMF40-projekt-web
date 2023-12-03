@@ -7,7 +7,7 @@ import { getMedData, submitScannedItem, deleteItem } from './handles/firebaseHan
  
 
 
-//Funktion för hämtning av månad från "expiration_date"
+//Funktion för hämtning av månad från "expiry"
 function getMonthFromDate(dateString) {
   const date = new Date(dateString);
   const month = date.getMonth() + 1; //Returnerar ett heltal som representerar utgångsdatumets månad
@@ -45,13 +45,16 @@ function sortByMonth(data) {
 
 function App() {
   
-  const [searchTerm, setSearchTerm] = useState('');
 
-  const [added, setAdded] = useState('');
+  const [message, setMessage] = useState('');
+
+  const [searchTerm, setSearchTerm] = useState('');
+  //const isSearchTermEmpty = searchTerm.trim() === '';
+
   const [removed, setRemoved] = useState('');
 
   const [avdelning, setAvdelning] = useState('');
-  const isSectionSelected = avdelning.trim() === 'N/A';
+  const isSectionSelected = avdelning.trim() === 'all';
 
   const[buttonPopup, setButtonPopup] = useState(false);
   const[removeButtonPopup, setRemoveButtonPopup] = useState(false);
@@ -81,8 +84,7 @@ function App() {
       console.log('rendered');
     })();
   }, [message, removed])
-  const [searchTerm, setSearchTerm] = useState('');
-  const isSearchTermEmpty = searchTerm.trim() === '';
+  
 
   const sortedMedDataArray = [...medDataArray].sort((a, b) => {
     const expiryA = a.expiry.toLowerCase();
@@ -147,31 +149,30 @@ const isComputer = window.innerWidth >= 500; //kollar om det är dator,
 
 const currentDate = new Date();
 //--------------------- UPPDELNING AV DATA I SEGMENT + SÖKNING --------------------------- 
-  const dataWithMonth = React.useMemo(() => {
-    const rawData = sortedMedDataArray.map((row) => ({
-      ...row,
-      month: getMonthFromDate(row.expiry),
-    }));
-    //Checka om det finns searchTerm, if(searchterm hittas i antingingen namn eller batch-rader), om inget hittas, skriv ut allt
-    return sortByMonth(rawData);
-  }, [medDataArray]);
-
-  // Gruppera alla rader i månads-avsnitt
-  const groupedData = dataWithMonth.reduce((acc, row) => {
-    const month = row.month;
-    if (!acc[month]) {
-      acc[month] = [];
-    }
-    acc[month].push(row);
-    return acc;
-  }, {});
-
-  const groupedRows = Object.entries(groupedData).map(([month, rows]) => ({
-    month,
-    rows,
+const dataWithMonth = React.useMemo(() => {
+  const rawData = sortedMedDataArray.map((row) => ({
+    ...row,
+    month: getMonthFromDate(row.expiry),
   }));
+  //Checka om det finns searchTerm, if(searchterm hittas i antingingen namn eller batch-rader), om inget hittas, skriv ut allt
+  return sortByMonth(rawData);
+}, [sortedMedDataArray]);
 
- 
+// Gruppera alla rader i månads-avsnitt
+const groupedData = dataWithMonth.reduce((acc, row) => {
+  const month = row.month;
+  if (!acc[month]) {
+    acc[month] = [];
+  }
+  acc[month].push(row);
+  return acc;
+}, {});
+
+const groupedRows = Object.entries(groupedData).map(([month, rows]) => ({
+  month,
+  rows,
+}));
+
 // Filtrera raderna baserat på avdelning (section)
 const sectionFilteredRows = dataWithMonth.filter((row) => 
   row.section.toLowerCase().includes(avdelning.trim().toLowerCase())
@@ -222,6 +223,41 @@ const options = [ //Avdelnings drop down meny
   ]
 
 //--------------------- ENDOF VAL AV AVDELNING --------------------------------- 
+  function highlightMatch(text, searchTerm) {
+    const regex = new RegExp(`(${searchTerm.trim()})`, 'gi');
+    return text.toLowerCase().includes(searchTerm.trim().toLowerCase()) ? (
+      <div dangerouslySetInnerHTML={{ __html: text.replace(regex, (match) => `<span style="background-color: yellow">${match}</span>`) }} />
+    ) : null;
+  }
+  function expireSoon(insertedDate){
+    const inputDate = new Date(insertedDate);
+  
+    const timeDifference = inputDate.getTime() - currentDate.getTime();
+  
+    const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000; 
+  
+    return timeDifference >= 0 && timeDifference <= oneWeekInMilliseconds;
+  }
+  
+  function expired(insertedDate){
+    const inputDate = new Date(insertedDate);
+  
+    const timeDifference = inputDate.getTime() - currentDate.getTime();
+  
+    return timeDifference <= 0;
+  }
+
+  function daysUntilExpires(insertedDate){
+    const inputDate = new Date(insertedDate);
+  
+    const timeDifference = inputDate.getTime() - currentDate.getTime();
+  
+    const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+  
+    return daysDifference;
+  }
+
+
 
   function handleSelect(event){ //Sätter in värdet i avdelning från vald i drop down
     setAvdelning(event.target.value);
@@ -235,13 +271,15 @@ const options = [ //Avdelnings drop down meny
 
   function addManually(){ //Lägg till läkemedel. Kolla så alla fält är ifyllda och att läkemedlet inte redan finns på avdelningen, visa pop-up
     console.log('add manually');
-    const inDataBase = JSON.stringify(medDataArray).toLowerCase();
+    //const inDataBase = JSON.stringify(medDataArray).toLowerCase();
     if(manName === "" || manDate === "" || manLot === ""){
       setMessage("Fyll i alla fält");
     }else{
       var duplicate = false;
       for (const item of medDataArray) {
-        if(item.gtin.toLowerCase() === manName.toLowerCase() && item.lot === manLot && item.section.toLowerCase() === manAvdelning.toLowerCase()){
+        if(item.gtin.toLowerCase() === manName.toLowerCase() && 
+        item.lot === manLot && 
+        item.section.toLowerCase() === manAvdelning.toLowerCase()){
           duplicate = true;
         }
       }
@@ -265,9 +303,11 @@ const options = [ //Avdelnings drop down meny
     setMessage("Borttagning lyckades");
 
     setTimeout(() => {
+      setMessage("");
       setRemoved("");
-    }, 1000);
+    }, 500);
   }
+
 
   // Rendera table
   return (
@@ -377,26 +417,26 @@ const options = [ //Avdelnings drop down meny
                           </div>)}
                         </td>
                         <td>
-                          {/* Highlighta text som matchar sökinput, annars renderera som vanligt */}
                           {row.gtin.toLowerCase().includes(searchTerm.trim().toLowerCase()) ? (
-                            <div dangerouslySetInnerHTML={{ __html: highlightMatch(row.gtin, searchTerm) }} />
-                            ) : (
+                            highlightMatch(row.gtin, searchTerm)
+                          ) : (
                             row.gtin
-                            )}
-                             </td>
-                        <td>
-                        {row.expiry.toLowerCase().includes(searchTerm.trim().toLowerCase()) ? (
-                            <div dangerouslySetInnerHTML={{ __html: highlightMatch(row.expiry, searchTerm) }} />
-                            ) : (
-                            row.expiry
-                            )}
+                          )}
                         </td>
-                        <td>{row.lot.toLowerCase().includes(searchTerm.trim().toLowerCase()) ? (
-                            <div dangerouslySetInnerHTML={{ __html: highlightMatch(row.lot, searchTerm) }} />
-                            ) : (
+                        <td>
+                          {row.expiry.toLowerCase().includes(searchTerm.trim().toLowerCase()) ? (
+                            highlightMatch(row.expiry, searchTerm)
+                          ) : (
+                            row.expiry
+                          )}
+                        </td>
+                        <td>
+                          {row.lot.toLowerCase().includes(searchTerm.trim().toLowerCase()) ? (
+                            highlightMatch(row.lot, searchTerm)
+                          ) : (
                             row.lot
-                            )}
-                            </td>
+                          )}
+                        </td>
                         <td>
                           {/* Endof highlighta text som matchar sökinput, annars renderera som vanligt */} 
                            <button

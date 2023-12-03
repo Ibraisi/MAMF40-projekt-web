@@ -27,10 +27,7 @@ export const validateSection = async (sectionId) => {
 export const getMedData = async () => {
     // Create query for med-data
     const q = query(collection(db, "med-data"));
-<<<<<<< HEAD
 
-=======
->>>>>>> 824868b90383bb36910537f52757cfb175c465cf
     try {
         // Execute query
         const querySnapshot = await getDocs(q);
@@ -38,13 +35,10 @@ export const getMedData = async () => {
 
         if (!querySnapshot.empty) {
             const document = querySnapshot.docs.map(doc => doc.data());
-<<<<<<< HEAD
         
             localStorage.setItem('medData', JSON.stringify(document));
             console.log('document: ', JSON.stringify(document));
             //return JSON.stringify(document);
-=======
->>>>>>> 824868b90383bb36910537f52757cfb175c465cf
             return document;
         } else {
             return null;
@@ -67,7 +61,7 @@ export const getMedData = async () => {
       console.error('Error adding document: ', e);
     }
   };
-  export const deleteItem = async (manName, manDate, manLot) => {
+  export const deleteItem = async (manName, manDate, manLot, manSection) => {
     try {
     
       const medCollectionRef = collection(db, 'med-data');
@@ -77,7 +71,8 @@ export const getMedData = async () => {
         medCollectionRef,
         where('gtin', '==', manName),
         where('expiry', '==', manDate),
-        where('lot', '==', manLot)
+        where('lot', '==', manLot),
+        where('section', '==', manSection)
       );
   
       // Execute the query
