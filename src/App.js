@@ -3,8 +3,7 @@ import fakeData from "./mock_data.json";
 import React, { useState } from "react";
 import Popup from './components/popup';
 //import { useTable, useGroupBy } from "react-table";
-import { validateSection, getMedData, parseItemData, submitScannedItem, deleteItem } from './handles/firebaseHandler';
- 
+import { getMedData, submitScannedItem, deleteItem } from './handles/firebaseHandler';
 
 //Funktion för hämtning av månad från "expiry"
 function getMonthFromDate(dateString) {
@@ -38,15 +37,19 @@ function getMonthNameFromNumber(monthNumber) {
 function sortByMonth(data) {
   return data.sort(
     (a, b) =>
-      getMonthFromDate(a.expiration_date) - getMonthFromDate(b.expiration_date)
+      getMonthFromDate(a.expiry) - getMonthFromDate(b.expiry)
   );
 }
 
 function App() {
+  
+  const [searchTerm, setSearchTerm] = useState('');
+
   const [added, setAdded] = useState('');
   const [removed, setRemoved] = useState('');
 
   const [avdelning, setAvdelning] = useState('');
+  const isSectionSelected = avdelning.trim() === 'N/A';
 
   const[buttonPopup, setButtonPopup] = useState(false);
   const[removeButtonPopup, setRemoveButtonPopup] = useState(false);
@@ -61,6 +64,10 @@ function App() {
   const [removeLot, setRemoveLot] = useState('');
 
   const [medDataArray, setMedDataArray] = useState([]);
+
+  const [isHovered, setIsHovered] = useState(false);
+
+
   console.log(fakeData);
 
   //
@@ -70,7 +77,9 @@ function App() {
       setMedDataArray(medData);
     })();
   }, [added, removed])
-  const [searchTerm, setSearchTerm] = useState('');
+  
+
+  
   const isSearchTermEmpty = searchTerm.trim() === '';
 
   console.log(fakeData);
@@ -119,7 +128,7 @@ const isComputer = window.innerWidth >= 500; //kollar om det är dator,
 
 
 
-
+const currentDate = new Date();
 //--------------------- UPPDELNING AV DATA I SEGMENT + SÖKNING --------------------------- 
   const dataWithMonth = React.useMemo(() => {
     console.log('medDataArray: ', medDataArray);
@@ -184,14 +193,14 @@ const filterChoice = isSectionSelected ? groupedRows : filteredGroupedRows;
 
 //--------------------- VAL AV AVDELNING --------------------------- 
 const options = [ //Avdelnings drop down meny
-{label: "Alla Avdelningar", value: "N/A"},
+{label: "Alla Avdelningar", value: "all"},
 {label: "Hjärt och lung", value: "heart"},
 {label: "Akut", value: "akut"},
 {label: "Barn och Ungdom", value: "barn"},
 ]
 
   const optionsAdd = [ //Avdelnings drop down meny
-    {label: "hjärt och lung", value: "heart"},
+    {label: "Hjärt och lung", value: "heart"},
     {label: "Akut", value: "akut"},
     {label: "Barn och Ungdom", value: "barn"},
   ]
@@ -203,15 +212,19 @@ function handleSelect(event){ //Sätter in värdet i avdelning från vald i drop
   setAdded("");
   }
 
-async function removeManually(){
+function removeManually(){
     console.log('remove manually');
     setRemoveButtonPopup(true);
-    console.log(buttonPopup);
   }
-  async function confirmRemoveManually() {
-    await deleteItem(removeGtin, removeExpiry, removeLot);
+  function confirmRemoveManually() {
+    deleteItem(removeGtin, removeExpiry, removeLot);
     setRemoved("Borttagning lyckades");
-  }
+    setAdded("Borttagning lyckades")
+
+    setTimeout(() => {
+      setRemoved("");
+    }, 500);
+}
   
   function manHandleSelect(event){ //Sätter in värdet i manAvdelning från vald i drop down för manuell tilläggning
     setManAvdelning(event.target.value);
@@ -219,24 +232,64 @@ async function removeManually(){
   }
 
   function addManually(){ //Skicka manName, manDate, manLot, manAvdelning till databas
-    console.log('add manually');
-    setButtonPopup(true);
-    console.log(buttonPopup);
+    const inDataBase = JSON.stringify(medDataArray).toLowerCase();
+    // Kolla att kombinationen av namn och lot inte redan finns på en avdelning
+  const isAlreadyAdded = medDataArray.some(
+    (item) =>
+      item.gtin.toLowerCase() === manName.toLowerCase() &&
+      item.lot === manLot &&
+      item.section.toLowerCase() === manAvdelning.toLowerCase()
+    );
+    if (!isAlreadyAdded) {
+      setButtonPopup(true);
+    } else {
+      setAdded("Läkemedlet finns redan");
+    }
   }
   
-  const submitManually = async () => {
-    await submitScannedItem(manName, manDate, manLot, manAvdelning);
-    setAdded("Tilläggning lyckades");
+  function submitManually (){
     submitScannedItem(manName, manDate, manLot, manAvdelning);
-  }
-  function removeManually(){
-    setRemoveButtonPopup(true);
-  }
-  function confirmRemoveManually(){
-    setRemoved("Borttagning lyckades");
-    deleteItem(removeGtin, removeExpiry, removeLot);
+    setAdded("Tilläggning lyckades");
 
+    setTimeout(() => {
+      setRemoved("");
+    }, 1000);
   }
+
+  function expireSoon(insertedDate){
+    const inputDate = new Date(insertedDate);
+  
+    const timeDifference = inputDate.getTime() - currentDate.getTime();
+  
+    const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000; 
+  
+    return timeDifference >= 0 && timeDifference <= oneWeekInMilliseconds;
+  }
+  
+  function expired(insertedDate){
+    const inputDate = new Date(insertedDate);
+  
+    const timeDifference = inputDate.getTime() - currentDate.getTime();
+  
+    return timeDifference <= 0;
+  }
+
+  function daysUntilExpires(insertedDate){
+    const inputDate = new Date(insertedDate);
+  
+    const timeDifference = inputDate.getTime() - currentDate.getTime();
+  
+    const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+  
+    return daysDifference;
+  }
+
+  // Hjälpfunktion för highlighting av söktermer
+  function highlightMatch(text, searchTerm) {
+  const regex = new RegExp(`(${searchTerm.trim()})`, 'gi');
+  return text.replace(regex, (match) => `<span style="background-color: yellow">${match}</span>`);
+}
+  
 
   // Render the table
   return (
@@ -289,7 +342,7 @@ async function removeManually(){
                         border: "1px solid #000",
                         textAlign: "left",
                         height: "40px",
-                        background: "#d2d2d2",
+                        background: "#f2f2f2",
                         fontSize: "20px"
                       }}
                     >
@@ -344,13 +397,32 @@ async function removeManually(){
                             ✓
                           </div>)}
                         </td>
-                        <td>{row.gtin}</td>
-                        <td>{row.expiry}</td>
-                        <td>{row.lot}</td>
-                        <td> 
+                        <td>
+                          {/* Highlighta text som matchar sökinput, annars renderera som vanligt */}
+                          {row.gtin.toLowerCase().includes(searchTerm.trim().toLowerCase()) ? (
+                            <div dangerouslySetInnerHTML={{ __html: highlightMatch(row.gtin, searchTerm) }} />
+                            ) : (
+                            row.gtin
+                            )}
+                             </td>
+                        <td>
+                        {row.expiry.toLowerCase().includes(searchTerm.trim().toLowerCase()) ? (
+                            <div dangerouslySetInnerHTML={{ __html: highlightMatch(row.expiry, searchTerm) }} />
+                            ) : (
+                            row.expiry
+                            )}
+                        </td>
+                        <td>{row.lot.toLowerCase().includes(searchTerm.trim().toLowerCase()) ? (
+                            <div dangerouslySetInnerHTML={{ __html: highlightMatch(row.lot, searchTerm) }} />
+                            ) : (
+                            row.lot
+                            )}
+                            </td>
+                        <td>
+                          {/* Endof highlighta text som matchar sökinput, annars renderera som vanligt */} 
                            <button
                               className="button-remove"
-                              onClick={() => {removeManually(); setRemoveGtin(row.gtin); setRemoveExpiry(row.expiry); setRemoveLot(row.lot);}}            
+                              onClick={() => {removeManually(); setRemoveGtin(row.gtin); setRemoveExpiry(row.expiry); setRemoveLot(row.lot); setAdded(""); setRemoved("");}}              
                             >
                               X
                             </button>

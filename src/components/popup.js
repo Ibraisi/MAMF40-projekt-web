@@ -1,6 +1,5 @@
 import React from 'react'
 import './popup.css'
-import submitManually from '../App'
 
 function Popup(props) {
     return (props.trigger) ? (
