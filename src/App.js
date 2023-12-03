@@ -4,8 +4,10 @@ import React, { useState } from "react";
 import Popup from './components/popup';
 //import { useTable, useGroupBy } from "react-table";
 import { getMedData, submitScannedItem, deleteItem } from './handles/firebaseHandler';
+ 
 
-//Funktion för hämtning av månad från "expiry"
+
+//Funktion för hämtning av månad från "expiration_date"
 function getMonthFromDate(dateString) {
   const date = new Date(dateString);
   const month = date.getMonth() + 1; //Returnerar ett heltal som representerar utgångsdatumets månad
@@ -57,11 +59,12 @@ function App() {
   const [manName, setManName] = useState('');
   const [manDate, setManDate] = useState('');
   const [manLot, setManLot] = useState('');
-  const [manAvdelning, setManAvdelning] = useState('');
+  const [manAvdelning, setManAvdelning] = useState('heart');
 
   const [removeGtin, setRemoveGtin] = useState('');
   const [removeExpiry, setRemoveExpiry] = useState('');
   const [removeLot, setRemoveLot] = useState('');
+  const [removeSection, setRemoveSection] = useState('');
 
   const [medDataArray, setMedDataArray] = useState([]);
 
@@ -75,14 +78,28 @@ function App() {
     (async () => {
       const medData = await getMedData();
       setMedDataArray(medData);
+      console.log('rendered');
     })();
-  }, [added, removed])
-  
-
-  
+  }, [message, removed])
+  const [searchTerm, setSearchTerm] = useState('');
   const isSearchTermEmpty = searchTerm.trim() === '';
 
-  console.log(fakeData);
+  const sortedMedDataArray = [...medDataArray].sort((a, b) => {
+    const expiryA = a.expiry.toLowerCase();
+    const expiryB = b.expiry.toLowerCase();
+  
+    if (expiryA < expiryB) {
+      return -1;
+    }
+    if (expiryA > expiryB) {
+      return 1;
+    }
+    return 0;
+  });
+  
+  // Now, sortedMedDataArray contains the sorted data based on the expiry property
+
+  //console.log(fakeData);
   // const data = React.useMemo(() => fakeData, []);
   //Dataset från JSON
   // const columns = React.useMemo(
@@ -131,8 +148,7 @@ const isComputer = window.innerWidth >= 500; //kollar om det är dator,
 const currentDate = new Date();
 //--------------------- UPPDELNING AV DATA I SEGMENT + SÖKNING --------------------------- 
   const dataWithMonth = React.useMemo(() => {
-    console.log('medDataArray: ', medDataArray);
-    const rawData = medDataArray.map((row) => ({
+    const rawData = sortedMedDataArray.map((row) => ({
       ...row,
       month: getMonthFromDate(row.expiry),
     }));
@@ -199,7 +215,7 @@ const options = [ //Avdelnings drop down meny
 {label: "Barn och Ungdom", value: "barn"},
 ]
 
-  const optionsAdd = [ //Avdelnings drop down meny
+  const optionsAdd = [ //Avdelnings drop down meny för manuell tilläggning
     {label: "Hjärt och lung", value: "heart"},
     {label: "Akut", value: "akut"},
     {label: "Barn och Ungdom", value: "barn"},
@@ -207,91 +223,53 @@ const options = [ //Avdelnings drop down meny
 
 //--------------------- ENDOF VAL AV AVDELNING --------------------------------- 
 
-function handleSelect(event){ //Sätter in värdet i avdelning från vald i drop down
-  setAvdelning(event.target.value);
-  setAdded("");
+  function handleSelect(event){ //Sätter in värdet i avdelning från vald i drop down
+    setAvdelning(event.target.value);
+    setMessage("");
   }
 
-function removeManually(){
-    console.log('remove manually');
-    setRemoveButtonPopup(true);
-  }
-  function confirmRemoveManually() {
-    deleteItem(removeGtin, removeExpiry, removeLot);
-    setRemoved("Borttagning lyckades");
-    setAdded("Borttagning lyckades")
-
-    setTimeout(() => {
-      setRemoved("");
-    }, 500);
-}
-  
   function manHandleSelect(event){ //Sätter in värdet i manAvdelning från vald i drop down för manuell tilläggning
     setManAvdelning(event.target.value);
-    setAdded("");
+    setMessage("");
   }
 
-  function addManually(){ //Skicka manName, manDate, manLot, manAvdelning till databas
+  function addManually(){ //Lägg till läkemedel. Kolla så alla fält är ifyllda och att läkemedlet inte redan finns på avdelningen, visa pop-up
+    console.log('add manually');
     const inDataBase = JSON.stringify(medDataArray).toLowerCase();
-    // Kolla att kombinationen av namn och lot inte redan finns på en avdelning
-  const isAlreadyAdded = medDataArray.some(
-    (item) =>
-      item.gtin.toLowerCase() === manName.toLowerCase() &&
-      item.lot === manLot &&
-      item.section.toLowerCase() === manAvdelning.toLowerCase()
-    );
-    if (!isAlreadyAdded) {
+    if(manName === "" || manDate === "" || manLot === ""){
+      setMessage("Fyll i alla fält");
+    }else{
+      var duplicate = false;
+      for (const item of medDataArray) {
+        if(item.gtin.toLowerCase() === manName.toLowerCase() && item.lot === manLot && item.section.toLowerCase() === manAvdelning.toLowerCase()){
+          duplicate = true;
+        }
+      }
+      if(!duplicate){
       setButtonPopup(true);
-    } else {
-      setAdded("Läkemedlet finns redan");
-    }
+    }else{
+      setMessage("Läkemedlet finns redan");
+    }}
   }
   
-  function submitManually (){
-    submitScannedItem(manName, manDate, manLot, manAvdelning);
-    setAdded("Tilläggning lyckades");
+  function submitManually(){ //tilläggning bekräftad, slutför tilläggning till databas och meddela användare
+      submitScannedItem(manName, manDate, manLot, manAvdelning);
+      setMessage("Tilläggning lyckades");
+  }
+  function removeManually(){//Ta bort läkemedel, visa pop-up 
+    console.log('remove manually')
+    setRemoveButtonPopup(true);
+  }
+  function confirmRemoveManually(){ //borttagning bekräftad, slutför borttagning från databas och meddela användare
+    deleteItem(removeGtin, removeExpiry, removeLot, removeSection);
+    setMessage("Borttagning lyckades");
 
     setTimeout(() => {
       setRemoved("");
     }, 1000);
   }
 
-  function expireSoon(insertedDate){
-    const inputDate = new Date(insertedDate);
-  
-    const timeDifference = inputDate.getTime() - currentDate.getTime();
-  
-    const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000; 
-  
-    return timeDifference >= 0 && timeDifference <= oneWeekInMilliseconds;
-  }
-  
-  function expired(insertedDate){
-    const inputDate = new Date(insertedDate);
-  
-    const timeDifference = inputDate.getTime() - currentDate.getTime();
-  
-    return timeDifference <= 0;
-  }
-
-  function daysUntilExpires(insertedDate){
-    const inputDate = new Date(insertedDate);
-  
-    const timeDifference = inputDate.getTime() - currentDate.getTime();
-  
-    const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-  
-    return daysDifference;
-  }
-
-  // Hjälpfunktion för highlighting av söktermer
-  function highlightMatch(text, searchTerm) {
-  const regex = new RegExp(`(${searchTerm.trim()})`, 'gi');
-  return text.replace(regex, (match) => `<span style="background-color: yellow">${match}</span>`);
-}
-  
-
-  // Render the table
+  // Rendera table
   return (
     <div className="App" >
       {/*<h1>{avdelning}</h1> test av dropdown*/}
@@ -316,7 +294,7 @@ function removeManually(){
             <input 
                 className="searchBox"
                 placeholder="Sök efter Batch/Läkemedelsnamn"
-                onChange={(e) => {setSearchTerm(e.target.value); setAdded("")}} //Innuti klamrar , skapa funktion som hämtar sökt objekt från JSON-fil
+                onChange={(e) => {setSearchTerm(e.target.value); setMessage("")}} //Innuti klamrar , skapa funktion som hämtar sökt objekt från JSON-fil
               />
           </div>
         </div>
@@ -359,6 +337,7 @@ function removeManually(){
                       <th>Namn på läkemedel</th>
                       <th>Utgångsdatum</th>
                       <th>LOT-nummer</th>
+                      <th>Avdelning</th>
                       {/*<th>Produktkod</th>*/}
                       {/*<th>Serienummer</th>*/}
                     </tr>
@@ -422,7 +401,7 @@ function removeManually(){
                           {/* Endof highlighta text som matchar sökinput, annars renderera som vanligt */} 
                            <button
                               className="button-remove"
-                              onClick={() => {removeManually(); setRemoveGtin(row.gtin); setRemoveExpiry(row.expiry); setRemoveLot(row.lot); setAdded(""); setRemoved("");}}              
+                              onClick={() => {removeManually(); setRemoveGtin(row.gtin); setRemoveExpiry(row.expiry); setRemoveLot(row.lot); setRemoveSection(row.section); setMessage(""); setRemoved("");}}            
                             >
                               X
                             </button>
@@ -448,17 +427,17 @@ function removeManually(){
             <input
               className="manual-input"
               placeholder="Läkemedelsnamn"
-              onChange={(e) => {setManName(e.target.value); setAdded(""); setRemoved("")}}              
+              onChange={(e) => {setManName(e.target.value); setMessage("")}}              
             />
             <input
               className="manual-input"
               placeholder="Utgångsdatum(ÅÅÅÅ-MM-DD)"
-              onChange={(e) => {setManDate(e.target.value); setAdded("")}}
+              onChange={(e) => {setManDate(e.target.value); setMessage("")}}
             />
             <input
               className="manual-input"
               placeholder="Batch-nr"
-              onChange={(e) => {setManLot(e.target.value); setAdded("")}}
+              onChange={(e) => {setManLot(e.target.value); setMessage("")}}
             />
             <select className="manual-input" onChange={manHandleSelect}> {/* Dropdown meny */}
                 {optionsAdd.map(option => (
@@ -468,7 +447,7 @@ function removeManually(){
             <button className="button-add"
               onClick={() => addManually()}
             >Lägg Till</button>
-            <p style={{height: "20px",}}>{added}</p>
+            <p style={{height: "20px",}}>{message}</p>
           </div>
         </div>
       : [] }
@@ -486,6 +465,7 @@ function removeManually(){
         <p> Läkemedelsnamn: {removeGtin}</p>
         <p> Utgångsdatum: {removeExpiry}</p>
         <p> Batch-nr: {removeLot}</p>
+        <p> Avdelning: {removeSection}</p>
       </Popup>
       
     </div>
