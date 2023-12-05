@@ -13,9 +13,16 @@ function getMonthFromDate(dateString) {
   const month = date.getMonth() + 1; //Returnerar ett heltal som representerar utgångsdatumets månad
   return month;
 }
+
+function getYearFromDate(dateString) {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  return year
+}
+
 //Hämtar namnet på månaden baserat på siffran från getMonthFromDate, kontrollerar om siffran är giltig
 function getMonthNameFromNumber(monthNumber) {
-  const months = [
+  const monthNames = [
     "Januari",
     "Februari",
     "Mars",
@@ -30,7 +37,7 @@ function getMonthNameFromNumber(monthNumber) {
     "December",
   ];
   if (monthNumber >= 1 && monthNumber <= 12) {
-    return months[monthNumber - 1]; 
+    return monthNames[monthNumber - 1]; 
   } else {
     return "Invalid Month";
   }
@@ -42,6 +49,8 @@ function sortByMonth(data) {
       getMonthFromDate(a.expiry) - getMonthFromDate(b.expiry)
   );
 }
+
+
 
 function App() {
   
@@ -84,8 +93,8 @@ function App() {
       console.log('rendered');
     })();
   }, [message, removed])
-  
 
+  
   const sortedMedDataArray = [...medDataArray].sort((a, b) => {
     const expiryA = a.expiry.toLowerCase();
     const expiryB = b.expiry.toLowerCase();
@@ -149,60 +158,69 @@ const isComputer = window.innerWidth >= 500; //kollar om det är dator,
 
 const currentDate = new Date();
 //--------------------- UPPDELNING AV DATA I SEGMENT + SÖKNING --------------------------- 
-const dataWithMonth = React.useMemo(() => {
+const dataWithMonthAndYear = React.useMemo(() => {
   const rawData = sortedMedDataArray.map((row) => ({
     ...row,
     month: getMonthFromDate(row.expiry),
+    year: getYearFromDate(row.expiry),
   }));
-  //Checka om det finns searchTerm, if(searchterm hittas i antingingen namn eller batch-rader), om inget hittas, skriv ut allt
+  // Check if there is searchTerm, if (searchTerm is found in either name or batch rows), if nothing is found, display everything
   return sortByMonth(rawData);
 }, [sortedMedDataArray]);
 
+
 // Gruppera alla rader i månads-avsnitt
-const groupedData = dataWithMonth.reduce((acc, row) => {
-  const month = row.month;
-  if (!acc[month]) {
-    acc[month] = [];
+const groupedData = dataWithMonthAndYear.reduce((acc, row) => {
+  const { year, month } = row; // Destructure year and month properties
+  const key = `${year}-${month}`;
+  if (!acc[key]) {
+    acc[key] = [];
   }
-  acc[month].push(row);
+  acc[key].push(row);
   return acc;
 }, {});
 
-const groupedRows = Object.entries(groupedData).map(([month, rows]) => ({
-  month,
-  rows,
-}));
+const groupedRows = Object.entries(groupedData).map(([key, rows]) => {
+  const [year, month] = key.split('-').map(Number); // Split the key and convert to numbers
+  return {
+    year,
+    month,
+    rows,
+  };
+});
 
 // Filtrera raderna baserat på avdelning (section)
-const sectionFilteredRows = dataWithMonth.filter((row) => 
+const sectionFilteredRows = dataWithMonthAndYear.filter((row) =>
   row.section.toLowerCase().includes(avdelning.trim().toLowerCase())
 );
 
 // Filtrera de section-filtrerade raderna baserat på sökterm
 const filteredRows = sectionFilteredRows.filter((row) =>
-  (
-    row.expiry.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
-    row.gtin.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
-    row.lot.toLowerCase().includes(searchTerm.trim().toLowerCase())
-  )
+  row.expiry.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
+  row.gtin.toLowerCase().includes(searchTerm.trim().toLowerCase()) ||
+  row.lot.toLowerCase().includes(searchTerm.trim().toLowerCase())
 );
 
 // Gruppen omstruktureras med filtrerade rader
 const filteredGroupedData = filteredRows.reduce((acc, row) => {
-const month = row.month;
-if (!acc[month]) {
-  acc[month] = [];
-}
-acc[month].push(row);
-return acc;
+  const { year, month } = row; // Destructure year and month properties
+  const key = `${year}-${month}`;
+  if (!acc[key]) {
+    acc[key] = [];
+  }
+  acc[key].push(row);
+  return acc;
 }, {});
 
-const filteredGroupedRows = Object.entries(filteredGroupedData).map(
-([month, rows]) => ({
-  month,
-  rows,
-})
-);
+const filteredGroupedRows = Object.entries(filteredGroupedData).map(([key, rows]) => {
+  const [year, month] = key.split('-').map(Number); // Split the key and convert to numbers
+  return {
+    year,
+    month,
+    rows,
+  };
+});
+
 const filterChoice = isSectionSelected ? groupedRows : filteredGroupedRows;
   //Datan ovanför söks igenom  i sökfunktion
 
@@ -307,6 +325,175 @@ const options = [ //Avdelnings drop down meny
       setRemoved("");
     }, 500);
   }
+  {
+    /*Om sökfönster är tomt, renderea som vanligt, annars rendererar man bara de sökninens träffar
+                 baserat på läkemedelsnamn eller LOT-nummer. filterChoice sätts beroende på sökrutans inehåll*/
+  }
+  {
+    /*Om sökfönster är tomt, renderea som vanligt, annars rendererar man bara de sökninens träffar
+                 baserat på läkemedelsnamn eller LOT-nummer. filterChoice sätts beroende på sökrutans inehåll*/
+  }
+  const sortedFilterChoice = [...filterChoice].sort((a, b) => {
+    // Compare years first
+    if (a.year !== b.year) {
+      return a.year - b.year;
+    }
+    // If years are the same, compare months
+    return a.month - b.month;
+  });
+
+  
+
+  let currentYear;
+
+const monthTableData = sortedFilterChoice.map(({ year, month, rows }) => {
+  const isNewYear = currentYear !== year;
+  currentYear = year;
+
+  return (
+    <div key={`${year}-${month}`}>
+      <table
+        style={{
+          width: "100%",
+        }}
+      >
+        {/*Renderera bara table head med år om det har skiftat till ett nytt år*/}
+           {isNewYear && (
+          <thead>
+            <tr
+            style={{
+              border: "1px solid #000",
+              textAlign: "center",
+              height: "40px",
+              background: "#aeaeae",
+              fontSize: "20px",
+            }}
+          >
+              <td className="bold-cell" colSpan="10">
+                {year}
+              </td>
+            </tr>
+          </thead>
+        )}
+
+        <tbody>
+          <tr
+            style={{
+              border: "1px solid #000",
+              textAlign: "left",
+              height: "40px",
+              background: "#f2f2f2",
+              fontSize: "20px",
+            }}
+          >
+            <td className="bold-cell" colSpan="10">
+              {getMonthNameFromNumber(month)}  {year}
+            </td>
+          </tr>
+          <tr
+            style={{
+              border: "1px solid #000",
+            }}
+          >
+            <th>Status</th>
+            <th>Namn på läkemedel</th>
+            <th>Utgångsdatum</th>
+            <th>LOT-nummer</th>
+            <th></th>
+            {/*<th>Produktkod</th>*/}
+            {/*<th>Serienummer</th>*/}
+          </tr>
+          {rows.map((row) => (
+            <tr
+              style={{
+                border: "0.5px solid grey",
+                background: expireSoon(row.expiry)
+                  ? "Orange"
+                  : expired(row.expiry)
+                  ? "#ea6e6e"
+                  : "#fff",
+              }}
+            >
+              <td>
+                {expireSoon(row.expiry) ? (
+                  <div
+                    className={`custom-tooltip ${isHovered ? "show" : ""}`}
+                    onMouseEnter={handleHover}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    !
+                    {isHovered && (
+                      <div className="expiring-tooltip-content">
+                        Går ut om {daysUntilExpires(row.expiry)} dagar
+                      </div>
+                    )}
+                  </div>
+                ) : expired(row.expiry) ? (
+                  <div
+                    className={`custom-tooltip ${isHovered ? "show" : ""}`}
+                    onMouseEnter={handleHover}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    !
+                    {isHovered && (
+                      <div className="expired-tooltip-content">Utgången</div>
+                    )}
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      color: "Green",
+                    }}
+                  >
+                    ✓
+                  </div>
+                )}
+              </td>
+              <td>
+                {row.gtin
+                  .toLowerCase()
+                  .includes(searchTerm.trim().toLowerCase())
+                  ? highlightMatch(row.gtin, searchTerm)
+                  : row.gtin}
+              </td>
+              <td>
+                {row.expiry
+                  .toLowerCase()
+                  .includes(searchTerm.trim().toLowerCase())
+                  ? highlightMatch(row.expiry, searchTerm)
+                  : row.expiry}
+              </td>
+              <td>
+                {row.lot.toLowerCase().includes(searchTerm.trim().toLowerCase())
+                  ? highlightMatch(row.lot, searchTerm)
+                  : row.lot}
+              </td>
+              <td>
+                {/* Endof highlighta text som matchar sökinput, annars renderera som vanligt */}
+                <button
+                  className="button-remove"
+                  onClick={() => {
+                    removeManually();
+                    setRemoveGtin(row.gtin);
+                    setRemoveExpiry(row.expiry);
+                    setRemoveLot(row.lot);
+                    setRemoveSection(row.section);
+                    setMessage("");
+                    setRemoved("");
+                  }}
+                >
+                  X
+                </button>
+              </td>
+              {/*<td>{row.product_code}</td>*/}
+              {/*<td>{row.serial_number}</td>*/}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+});
 
 
   // Rendera table
@@ -343,120 +530,9 @@ const options = [ //Avdelnings drop down meny
       <div className="center-table">
         <div className="table-outer-div">
           <div className="table-div">
-            <table
-              style={{
-                width: "100%",
-              }}
-            >
-              <thead>{/* OM MAN VILL LÄGGA NÅGOT I TABLE HEAD SENARE */}</thead>
-              <tbody>
-
-                {/*Om sökfönster är tomt, renderea som vanligt, annars rendererar man bara de sökninens träffar
-                 baserat på läkemedelsnamn eller LOT-nummer. filterChoice sätts beroende på sökrutans inehåll*/}
-                {(filterChoice.map(({ month, rows }) => (
-                  <React.Fragment key={month}>
-                    <tr
-                      style={{
-                        border: "1px solid #000",
-                        textAlign: "left",
-                        height: "40px",
-                        background: "#f2f2f2",
-                        fontSize: "20px"
-                      }}
-                    >
-                      <td className="bold-cell" colSpan="10">
-                        {getMonthNameFromNumber(month)}
-                      </td>
-                    </tr>
-                    <tr
-                      style={{
-                        border: "1px solid #000",
-                      }}
-                    >
-                      <th>Status</th>
-                      <th>Namn på läkemedel</th>
-                      <th>Utgångsdatum</th>
-                      <th>LOT-nummer</th>
-                      <th>Avdelning</th>
-                      {/*<th>Produktkod</th>*/}
-                      {/*<th>Serienummer</th>*/}
-                    </tr>
-                    {rows.map((row) => (
-                     <tr
-                     style={{
-                       border: "0.5px solid grey",
-                       background: 
-                        expireSoon(row.expiry) ? "Orange" 
-                        :expired(row.expiry )? "#ea6e6e" 
-                        :"#fff",
-                     }}
-                   >
-                        <td>
-                        {expireSoon(row.expiry) ? (
-                          <div 
-                              className={`custom-tooltip ${isHovered ? 'show' : ''}`}
-                              onMouseEnter={handleHover}
-                              onMouseLeave={handleMouseLeave}>
-                              !
-                              {isHovered && <div className="expiring-tooltip-content">Går ut om {daysUntilExpires(row.expiry)} dagar</div>}
-                           </div>
-                          ):expired(row.expiry) ? (
-                            <div 
-                            className={`custom-tooltip ${isHovered ? 'show' : ''}`}
-                            onMouseEnter={handleHover}
-                            onMouseLeave={handleMouseLeave}>
-                            !
-                            {isHovered && <div className="expired-tooltip-content">Utgången</div>}
-                            </div>
-                          ):(<div
-                            style ={{
-                              color:"Green",
-                            }}
-                          >
-                            ✓
-                          </div>)}
-                        </td>
-                        <td>
-                          {row.gtin.toLowerCase().includes(searchTerm.trim().toLowerCase()) ? (
-                            highlightMatch(row.gtin, searchTerm)
-                          ) : (
-                            row.gtin
-                          )}
-                        </td>
-                        <td>
-                          {row.expiry.toLowerCase().includes(searchTerm.trim().toLowerCase()) ? (
-                            highlightMatch(row.expiry, searchTerm)
-                          ) : (
-                            row.expiry
-                          )}
-                        </td>
-                        <td>
-                          {row.lot.toLowerCase().includes(searchTerm.trim().toLowerCase()) ? (
-                            highlightMatch(row.lot, searchTerm)
-                          ) : (
-                            row.lot
-                          )}
-                        </td>
-                        <td>
-                          {/* Endof highlighta text som matchar sökinput, annars renderera som vanligt */} 
-                           <button
-                              className="button-remove"
-                              onClick={() => {removeManually(); setRemoveGtin(row.gtin); setRemoveExpiry(row.expiry); setRemoveLot(row.lot); setRemoveSection(row.section); setMessage(""); setRemoved("");}}            
-                            >
-                              X
-                            </button>
-                          </td>
-                        {/*<td>{row.product_code}</td>*/}
-                        {/*<td>{row.serial_number}</td>*/}
-                      </tr>
-                    ))}
-                  </React.Fragment>
-                )))} 
-              </tbody>
-            </table>
+            {monthTableData}
           </div>
         </div>
-        
       </div>
       
       {isComputer ?
