@@ -365,7 +365,7 @@ const monthTableData = sortedFilterChoice.map(({ year, month, rows }) => {
               border: "1px solid #000",
               textAlign: "center",
               height: "40px",
-              background: "#aeaeae",
+              background: "#afafaf",
               fontSize: "20px",
             }}
           >
