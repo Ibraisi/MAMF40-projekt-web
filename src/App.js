@@ -399,7 +399,7 @@ const monthTableData = sortedFilterChoice.map(({ year, month, rows }) => {
             <th>Namn på läkemedel</th>
             <th>Utgångsdatum</th>
             <th>LOT-nummer</th>
-            <th></th>
+            <th>Avdelning</th>
             {/*<th>Produktkod</th>*/}
             {/*<th>Serienummer</th>*/}
           </tr>
