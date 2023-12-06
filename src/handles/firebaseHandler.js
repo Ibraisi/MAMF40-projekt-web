@@ -35,10 +35,7 @@ export const getMedData = async () => {
 
         if (!querySnapshot.empty) {
             const document = querySnapshot.docs.map(doc => doc.data());
-        
-            localStorage.setItem('medData', JSON.stringify(document));
             console.log('document: ', JSON.stringify(document));
-            //return JSON.stringify(document);
             return document;
         } else {
             return null;
@@ -77,7 +74,7 @@ export const getMedData = async () => {
   
       // Execute the query
       const querySnapshot = await getDocs(q);
-      
+  
       // Check if a document matching the query exists
       if (!querySnapshot.empty) {
         // Get the reference to the document

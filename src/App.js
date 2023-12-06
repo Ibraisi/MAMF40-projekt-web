@@ -73,10 +73,9 @@ function App() {
 
   const [isHovered, setIsHovered] = useState(false);
 
+  const [Checked, setChecked] = useState(true);
 
-  console.log(fakeData);
-
-  //
+  
   React.useEffect(() => {
     (async () => {
       const medData = await getMedData();
@@ -98,41 +97,6 @@ function App() {
     }
     return 0;
   });
-  
-  // Now, sortedMedDataArray contains the sorted data based on the expiry property
-
-  //console.log(fakeData);
-  // const data = React.useMemo(() => fakeData, []);
-  //Dataset från JSON
-  // const columns = React.useMemo(
-  //   () => [
-  //     {
-  //       Header: "ID",
-  //       accessor: "section",
-  //     },
-  //     {
-  //       Header: "Namn på läkemedel",
-  //       accessor: "gtin",
-  //     },
-  //     {
-  //       Header: "Utgångsdatum",
-  //       accessor: "expiry",
-  //     },
-  //     {
-  //       Header: "LOT-nummer",
-  //       accessor: "lot",
-  //     },
-  //     {
-  //       Header: "Serienummer",
-  //       accessor: "serial",
-  //     },
-  //   ],
-  //   []
-  // );
-
-  //const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-   //useTable({ columns, data }, useGroupBy);
-  console.log(fakeData);
 
    const handleHover = () => {
      setIsHovered(true);
@@ -293,6 +257,17 @@ const options = [ //Avdelnings drop down meny
   function submitManually(){ //tilläggning bekräftad, slutför tilläggning till databas och meddela användare
       submitScannedItem(manName, manDate, manLot, manAvdelning);
       setMessage("Tilläggning lyckades");
+      var checkBox = document.getElementById("myCheck");
+      console.log("CheckBox: ", checkBox);
+      if(checkBox.checked===true){
+        console.log("CheckBox.checked: ", document.getElementById('myCheck').checked);
+        document.getElementById('input').value = '';
+        document.getElementById('input2').value = '';
+        document.getElementById('input3').value = '';
+        setManName('');
+        setManDate('');
+        setManLot('');
+      }
   }
   function removeManually(){//Ta bort läkemedel, visa pop-up 
     console.log('remove manually')
@@ -307,6 +282,10 @@ const options = [ //Avdelnings drop down meny
       setRemoved("");
     }, 500);
   }
+
+  const handleCheckboxChange = () => {
+    setChecked(!Checked);
+  };
 
 
   // Rendera table
@@ -327,7 +306,11 @@ const options = [ //Avdelnings drop down meny
           </select>
         </div>
         <div className="title-div">
-          <p className="title-name">Med-skAPP</p>
+          <img
+              src="Region_skåne-removebg-preview.png"
+              alt="Region Skåne Logo"
+              className="title-image"
+          />
         </div>
         <div className="right-search">
           <div className="right-search">
@@ -377,7 +360,6 @@ const options = [ //Avdelnings drop down meny
                       <th>Namn på läkemedel</th>
                       <th>Utgångsdatum</th>
                       <th>LOT-nummer</th>
-                      <th>Avdelning</th>
                       {/*<th>Produktkod</th>*/}
                       {/*<th>Serienummer</th>*/}
                     </tr>
@@ -465,16 +447,19 @@ const options = [ //Avdelnings drop down meny
 
           <div className="manual-input-div">
             <input
+              id="input"
               className="manual-input"
               placeholder="Läkemedelsnamn"
-              onChange={(e) => {setManName(e.target.value); setMessage("")}}              
+              onChange={(e) => {setManName(e.target.value); setMessage("")}}         
             />
             <input
+              id="input2"
               className="manual-input"
               placeholder="Utgångsdatum(ÅÅÅÅ-MM-DD)"
               onChange={(e) => {setManDate(e.target.value); setMessage("")}}
             />
             <input
+              id="input3"
               className="manual-input"
               placeholder="Batch-nr"
               onChange={(e) => {setManLot(e.target.value); setMessage("")}}
@@ -485,14 +470,22 @@ const options = [ //Avdelnings drop down meny
                   ))}
               </select>
             <button className="button-add"
-              onClick={() => addManually()}
+              onClick={() => {addManually(); console.log(Checked, document.getElementById("myCheck").checked);}}
             >Lägg Till</button>
-            <p style={{height: "20px",}}>{message}</p>
+            
+            <label className="Check"> Töm fält efter tilläggning
+              <input 
+                type="checkbox"
+                id="myCheck" 
+                checked = {Checked}
+                onChange={handleCheckboxChange}/>
+                <span className="checkmark"></span>
+            </label>
           </div>
         </div>
       : [] }
 
-      <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually}>
+      <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually} confirmButtonText="Lägg till">
         <h3>Lägg till:</h3>
         <p>Läkemedelsnamn: {manName}</p>
         <p>Utgångsdatum: {manDate}</p>
