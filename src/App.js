@@ -108,39 +108,6 @@ function App() {
     return 0;
   });
   
-  // Now, sortedMedDataArray contains the sorted data based on the expiry property
-
-  //console.log(fakeData);
-  // const data = React.useMemo(() => fakeData, []);
-  //Dataset från JSON
-  // const columns = React.useMemo(
-  //   () => [
-  //     {
-  //       Header: "ID",
-  //       accessor: "section",
-  //     },
-  //     {
-  //       Header: "Namn på läkemedel",
-  //       accessor: "gtin",
-  //     },
-  //     {
-  //       Header: "Utgångsdatum",
-  //       accessor: "expiry",
-  //     },
-  //     {
-  //       Header: "LOT-nummer",
-  //       accessor: "lot",
-  //     },
-  //     {
-  //       Header: "Serienummer",
-  //       accessor: "serial",
-  //     },
-  //   ],
-  //   []
-  // );
-
-  //const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-   //useTable({ columns, data }, useGroupBy);
   console.log(fakeData);
 
    const handleHover = () => {
@@ -342,11 +309,10 @@ const options = [ //Avdelnings drop down meny
     return a.month - b.month;
   });
 
-  
+let currentYear; //Variabel för att hålla koll på när det är dags att renderera nya "year"-table heads
 
-  let currentYear;
-
-const monthTableData = sortedFilterChoice.map(({ year, month, rows }) => {
+//Komponent som renderar alla tables
+const table = sortedFilterChoice.map(({ year, month, rows }) => {
   const isNewYear = currentYear !== year;
   currentYear = year;
 
@@ -365,7 +331,7 @@ const monthTableData = sortedFilterChoice.map(({ year, month, rows }) => {
               border: "1px solid #000",
               textAlign: "center",
               height: "40px",
-              background: "#afafaf",
+              background: "#c4c4c4",
               fontSize: "20px",
             }}
           >
@@ -399,7 +365,7 @@ const monthTableData = sortedFilterChoice.map(({ year, month, rows }) => {
             <th>Namn på läkemedel</th>
             <th>Utgångsdatum</th>
             <th>LOT-nummer</th>
-            <th>Avdelning</th>
+            <th></th>
             {/*<th>Produktkod</th>*/}
             {/*<th>Serienummer</th>*/}
           </tr>
@@ -408,10 +374,10 @@ const monthTableData = sortedFilterChoice.map(({ year, month, rows }) => {
               style={{
                 border: "0.5px solid grey",
                 background: expireSoon(row.expiry)
-                  ? "Orange"
-                  : expired(row.expiry)
-                  ? "#ea6e6e"
-                  : "#fff",
+                ? "Orange"
+                : expired(row.expiry)
+                ? "#ea6e6e"
+                : "#fff",
               }}
             >
               <td>
@@ -495,9 +461,156 @@ const monthTableData = sortedFilterChoice.map(({ year, month, rows }) => {
   );
 });
 
+const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
+  const isNewYear = currentYear !== year;
+  currentYear = year;
+
+  return (
+    <div key={`${year}-${month}`}>
+      <table
+        style={{
+          width: "100%",
+        }}
+      >
+        {/*Renderera bara table head med år om det har skiftat till ett nytt år*/}
+           {isNewYear && (
+          <thead>
+            <tr
+            style={{
+              border: "1px solid #000",
+              textAlign: "center",
+              height: "20px",
+              background: "#c4c4c4",
+              fontSize: "10px",
+            }}
+          >
+              <td className="bold-cell" colSpan="10">
+                {year}
+              </td>
+            </tr>
+          </thead>
+        )}
+
+        <tbody>
+          <tr
+            style={{
+              border: "1px solid #000",
+              textAlign: "left",
+              height: "20px",
+              background: "#f2f2f2",
+              fontSize: "10px",
+            }}
+          >
+            <td className="bold-cell" colSpan="10">
+              {getMonthNameFromNumber(month)}  {year}
+            </td>
+          </tr>
+          <tr
+            style={{
+              border: "0.5px solid #000",
+            }}
+          >
+            <th>Status</th>
+            <th>Namn på läkemedel</th>
+            <th>Utgångsdatum</th>
+            <th>LOT-nummer</th>
+            <th></th>
+            {/*<th>Produktkod</th>*/}
+            {/*<th>Serienummer</th>*/}
+          </tr>
+          {rows.map((row) => (
+            <tr
+              style={{
+                border: "0.5px solid grey",
+                background:  expired(row.expiry)
+                  ? "#ea6e6e"
+                  : "#fff",
+              }}
+            >
+              <td>
+                {expireSoon(row.expiry) ? (
+                  <div
+                    className={`custom-tooltip ${isHovered ? "show" : ""}`}
+                    onMouseEnter={handleHover}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    !
+                    {isHovered && (
+                      <div className="expiring-tooltip-content">
+                        Går ut om {daysUntilExpires(row.expiry)} dagar
+                      </div>
+                    )}
+                  </div>
+                ) : expired(row.expiry) ? (
+                  <div
+                    className={`custom-tooltip ${isHovered ? "show" : ""}`}
+                    onMouseEnter={handleHover}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    !
+                    {isHovered && (
+                      <div className="expired-tooltip-content">Utgången</div>
+                    )}
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      color: "Green",
+                    }}
+                  >
+                    ✓
+                  </div>
+                )}
+              </td>
+              <td>
+                {row.gtin
+                  .toLowerCase()
+                  .includes(searchTerm.trim().toLowerCase())
+                  ? highlightMatch(row.gtin, searchTerm)
+                  : row.gtin}
+              </td>
+              <td>
+                {row.expiry
+                  .toLowerCase()
+                  .includes(searchTerm.trim().toLowerCase())
+                  ? highlightMatch(row.expiry, searchTerm)
+                  : row.expiry}
+              </td>
+              <td>
+                {row.lot.toLowerCase().includes(searchTerm.trim().toLowerCase())
+                  ? highlightMatch(row.lot, searchTerm)
+                  : row.lot}
+              </td>
+              <td>
+                {/* Endof highlighta text som matchar sökinput, annars renderera som vanligt */}
+                <button
+                  className="mobile-button-remove"
+                  onClick={() => {
+                    removeManually();
+                    setRemoveGtin(row.gtin);
+                    setRemoveExpiry(row.expiry);
+                    setRemoveLot(row.lot);
+                    setRemoveSection(row.section);
+                    setMessage("");
+                    setRemoved("");
+                  }}
+                >
+                  X
+                </button>
+              </td>
+              {/*<td>{row.product_code}</td>*/}
+              {/*<td>{row.serial_number}</td>*/}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+});
 
   // Rendera table
   return (
+    isComputer ? 
     <div className="App" >
       {/*<h1>{avdelning}</h1> test av dropdown*/}
       {/*<h1>{manName}</h1> {/*test av sökfält*/}
@@ -526,16 +639,13 @@ const monthTableData = sortedFilterChoice.map(({ year, month, rows }) => {
           </div>
         </div>
       </div>
-
       <div className="center-table">
         <div className="table-outer-div">
           <div className="table-div">
-            {monthTableData}
+            {table}
           </div>
         </div>
       </div>
-      
-      {isComputer ?
         <div className="manual-box"> {/* Div till Manuell input av läkemedel */}
           <div style={{height: "40px", width: "100%"}}><p className="textAdd">Lägg Till Manuellt</p></div>
 
@@ -566,8 +676,6 @@ const monthTableData = sortedFilterChoice.map(({ year, month, rows }) => {
             <p style={{height: "20px",}}>{message}</p>
           </div>
         </div>
-      : [] }
-
       <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually}>
         <h3>Lägg till:</h3>
         <p>Läkemedelsnamn: {manName}</p>
@@ -583,8 +691,100 @@ const monthTableData = sortedFilterChoice.map(({ year, month, rows }) => {
         <p> Batch-nr: {removeLot}</p>
         <p> Avdelning: {removeSection}</p>
       </Popup>
-      
     </div>
+    : //Else - sats för mobiler
+    <div className="mobile-App" style={{ fontSize: "10px" }}> {/* Justerad textstorlek för mobil */}
+    <div className="search-bar">
+      <div className="left-search">
+        <select className="mobile- searchBox"  onChange={handleSelect}>
+          {options.map((option) => (
+            <option value={option.value}>{option.label}</option>
+          ))}
+        </select>
+      </div>
+      <div className="title-div">
+      </div>
+      <div className="right-search">
+        <div className="right-search">
+          <input
+            className="mobile-searchBox"
+            placeholder="Sök efter Batch/Läkemedelsnamn"
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setMessage("");
+            }}
+          />
+        </div>
+      </div>
+    </div>
+
+    <div className="center-table" style ={{
+      width: "500px"
+    }}>
+      <div className="mobile-table-outer-div">
+        <div className="table-div">
+          {mobileTable}
+          </div>
+      </div>
+    </div>
+
+    <div className="mobile-manual-box">
+      <div style={{ height: "10px", width: "100%" }}>
+        <p className="mobile-textAdd">Lägg Till Manuellt</p>
+      </div>
+
+      <div className="manual-input-div">
+        <input
+          className="mobile-manual-input"
+          placeholder="Namn"
+          onChange={(e) => {
+            setManName(e.target.value);
+            setMessage("");
+          }}
+        />
+        <input
+          className="mobile-manual-input"
+          placeholder="(ÅÅÅÅ-MM-DD)"
+          onChange={(e) => {
+            setManDate(e.target.value);
+            setMessage("");
+          }}
+        />
+        <input
+          className="mobile-manual-input"
+          placeholder="Batch-nr"
+          onChange={(e) => {
+            setManLot(e.target.value);
+            setMessage("");
+          }}
+        />
+        <select className="mobile-manual-input" onChange={manHandleSelect}>
+          {optionsAdd.map((option) => (
+            <option value={option.value}>{option.label}</option>
+          ))}
+        </select>
+        <button className="mobile-button-add" onClick={() => addManually()}>
+          Lägg Till
+        </button>
+        <p style={{ height: "20px" }}>{message}</p>
+      </div>
+    </div>
+    <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually}>
+        <h3>Lägg till:</h3>
+        <p>Läkemedelsnamn: {manName}</p>
+        <p>Utgångsdatum: {manDate}</p>
+        <p>Batch-nr: {manLot}</p>
+        <p>Avdelning: {manAvdelning}</p>
+      </Popup>
+      
+      <Popup trigger={removeButtonPopup} setTrigger={setRemoveButtonPopup} setManually={confirmRemoveManually} confirmButtonText="Ta bort">
+        <h3>Ta bort:</h3>
+        <p> Läkemedelsnamn: {removeGtin}</p>
+        <p> Utgångsdatum: {removeExpiry}</p>
+        <p> Batch-nr: {removeLot}</p>
+        <p> Avdelning: {removeSection}</p>
+      </Popup>
+  </div>
   );
 }
 export default App;

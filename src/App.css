@@ -46,11 +46,28 @@
   background: radial-gradient(circle, rgba(15,97,136,1) 0%, rgba(116,204,241,1) 80%, rgba(171,228,255,1) 100%); 
 }
 
+.mobile-App {
+  height: 90vh;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-direction: column;
+  background: rgb(15,97,136);
+  background: radial-gradient(circle, rgba(15,97,136,1) 0%, rgba(116,204,241,1) 80%, rgba(171,228,255,1) 100%); 
+}
+
 .table-outer-div{
   width: 75%;
   height: 65vh;
   overflow: hidden;
   border-radius: 30px;
+  border: 2px solid #000;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+.mobile-table-outer-div{
+  width: 75%;
+  height: 65vh;
+  overflow: hidden;
   border: 2px solid #000;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
@@ -60,7 +77,6 @@
   height: 100%;
   overflow: auto;
   background-color: #ffffff;
-  
 }
 
 .center-table {
@@ -112,7 +128,7 @@
 
 .searchBox{
   width: 240px;
-  padding: 12px 20px;
+  padding: 8px 20px;
   margin: 8px 0;
   display: inline-block;
   border: 1px solid #ccc;
@@ -121,7 +137,18 @@
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   background: #fff;
 }
-
+.mobile-searchBox{
+  width: 100px;
+  height: 20px;
+  padding: 12px 2px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  background: #fff;
+}
 
 
 .manual-input-div{
@@ -147,6 +174,17 @@
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
+.mobile-manual-box{
+  display: flex;
+  flex-direction: column;
+  height: 12vh;
+  width: 100%;
+  border-style: solid;
+  border-width: 1px;
+  background-color: #d2d2d2;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
 .manual-input{
   width: 240px;
   padding: 6px 20px;
@@ -159,11 +197,30 @@
   background: #fff;
 }
 
+.mobile-manual-input {
+  width: 70px; /* Adjust the width to half of the original size */
+  padding: 3px 5px; /* Adjust padding as needed */
+  margin: 4px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 10px; /* Adjust border radius as needed */
+  box-sizing: border-box;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
+  background: #fff;
+}
+
+
 .textAdd{
   font-weight: bold;
   font-size: 20px;
   margin-top: 5px;
 }
+.mobile-textAdd{
+  font-weight: bold;
+  font-size: 10px;
+  margin-top: 5px;
+}
+
 
 .button-add{
   height: 30px;
@@ -172,12 +229,21 @@
   border: 4px double;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   transition: background-color 0.1s;
-  
 }
 .button-add:active {
   background-color: #919191; /* Darker shade when pressed */
 }
-
+.mobile-button-add{
+  height: 40px;
+  width: 55px;
+  border-radius: 20px;
+  border: 4px double;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.1s;
+}
+.mobile-button-add:active {
+  background-color: #919191; /* Darker shade when pressed */
+}
 
 .button-remove{
   height: 30px;
@@ -188,6 +254,18 @@
   transition: background-color 0.1s;
 }
 .button-remove:active {
+  background-color: #919191; /* Darker shade when pressed */
+}
+
+.mobile-button-remove{
+  height: 30px;
+  width: 15px;
+  border-radius: 14px;
+  border: 4px;
+  font-size: 15px; 
+  transition: background-color 0.1s;
+}
+.mobile-button-remove:active {
   background-color: #919191; /* Darker shade when pressed */
 }
 
