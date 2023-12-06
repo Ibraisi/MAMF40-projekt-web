@@ -243,7 +243,7 @@ const options = [ //Avdelnings drop down meny
 
   function handleSelect(event){ //Sätter in värdet i avdelning från vald i drop down
     setAvdelning(event.target.value);
-    setMessage("");
+    setMessage("2");
   }
 
   function manHandleSelect(event){ //Sätter in värdet i manAvdelning från vald i drop down för manuell tilläggning
@@ -702,6 +702,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
                 onChange={handleCheckboxChange}/>
                 <span className="checkmark"></span>
             </label>
+            <p className="message">{message}</p>
           </div>
         </div>
 
@@ -795,7 +796,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
         <button className="mobile-button-add" onClick={() => addManually()}>
           Lägg Till
         </button>
-        <p style={{ height: "20px" }}>{message}</p>
+        
       </div>
     </div>
     <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually}>
