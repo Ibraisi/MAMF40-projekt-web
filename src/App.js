@@ -6,7 +6,6 @@ import Popup from './components/popup';
 import { getMedData, submitScannedItem, deleteItem } from './handles/firebaseHandler';
  
 
-
 //Funktion för hämtning av månad från "expiry"
 function getMonthFromDate(dateString) {
   const date = new Date(dateString);
@@ -54,6 +53,8 @@ function sortByMonth(data) {
 
 
 function App() {
+
+  //statusvariabler 
   const [message, setMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [removed, setRemoved] = useState('');
@@ -62,18 +63,21 @@ function App() {
   const [removeExpiry, setRemoveExpiry] = useState('');
   const [removeLot, setRemoveLot] = useState('');
   const [removeSection, setRemoveSection] = useState('');
+
   const [manName, setManName] = useState('');
   const [manDate, setManDate] = useState('');
   const [manLot, setManLot] = useState('');
   const [manAvdelning, setManAvdelning] = useState('heart');
-  const isSectionSelected = avdelning.trim() === 'all';
+
   const[buttonPopup, setButtonPopup] = useState(false);
   const[removeButtonPopup, setRemoveButtonPopup] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [Checked, setChecked] = useState(true);
   const [medDataArray, setMedDataArray] = useState([]);
+  
+  const isSectionSelected = avdelning.trim() === 'all';
 
-  //rendera när message eller removed ändras
+  //Hämta medicindata när message eller removed ändras
   React.useEffect(() => {
     (async () => {
       const medData = await getMedData();
@@ -82,7 +86,7 @@ function App() {
     })();
   }, [message, removed])
 
-  
+  //sortera läkemedelsdata baserat på expiry
   const sortedMedDataArray = [...medDataArray].sort((a, b) => {
     const expiryA = a.expiry.toLowerCase();
     const expiryB = b.expiry.toLowerCase();
@@ -106,8 +110,6 @@ function App() {
    
 
 const isComputer = window.innerWidth >= 500; //kollar om det är dator, 
-
-
 
 const currentDate = new Date();
 //--------------------- UPPDELNING AV DATA I SEGMENT + SÖKNING --------------------------- 
