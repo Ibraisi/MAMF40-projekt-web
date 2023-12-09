@@ -67,7 +67,7 @@ function App() {
   const [manName, setManName] = useState('');
   const [manDate, setManDate] = useState('');
   const [manLot, setManLot] = useState('');
-  const [manAvdelning, setManAvdelning] = useState('heart');
+  const [manAvdelning, setManAvdelning] = useState('Hjärt och Lung');
 
   const[buttonPopup, setButtonPopup] = useState(false);
   const[removeButtonPopup, setRemoveButtonPopup] = useState(false);
