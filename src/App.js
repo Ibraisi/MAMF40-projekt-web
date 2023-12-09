@@ -14,6 +14,7 @@ function getMonthFromDate(dateString) {
   return month;
 }
 
+//Funktion för hämtning av år från "expiry"
 function getYearFromDate(dateString) {
   const date = new Date(dateString);
   const year = date.getFullYear();
@@ -53,38 +54,26 @@ function sortByMonth(data) {
 
 
 function App() {
-  
-
   const [message, setMessage] = useState('');
-
   const [searchTerm, setSearchTerm] = useState('');
-  //const isSearchTermEmpty = searchTerm.trim() === '';
-
   const [removed, setRemoved] = useState('');
-
   const [avdelning, setAvdelning] = useState('');
-  const isSectionSelected = avdelning.trim() === 'all';
-
-  const[buttonPopup, setButtonPopup] = useState(false);
-  const[removeButtonPopup, setRemoveButtonPopup] = useState(false);
-
-  const [manName, setManName] = useState('');
-  const [manDate, setManDate] = useState('');
-  const [manLot, setManLot] = useState('');
-  const [manAvdelning, setManAvdelning] = useState('heart');
-
   const [removeGtin, setRemoveGtin] = useState('');
   const [removeExpiry, setRemoveExpiry] = useState('');
   const [removeLot, setRemoveLot] = useState('');
   const [removeSection, setRemoveSection] = useState('');
-
+  const [manName, setManName] = useState('');
+  const [manDate, setManDate] = useState('');
+  const [manLot, setManLot] = useState('');
+  const [manAvdelning, setManAvdelning] = useState('heart');
+  const isSectionSelected = avdelning.trim() === 'all';
+  const[buttonPopup, setButtonPopup] = useState(false);
+  const[removeButtonPopup, setRemoveButtonPopup] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [Checked, setChecked] = useState(true);
   const [medDataArray, setMedDataArray] = useState([]);
 
-  const [isHovered, setIsHovered] = useState(false);
-
-  const [Checked, setChecked] = useState(true);
-
-  
+  //rendera när message eller removed ändras
   React.useEffect(() => {
     (async () => {
       const medData = await getMedData();
@@ -196,12 +185,16 @@ const options = [ //Avdelnings drop down meny
 {label: "Hjärt och lung", value: "heart"},
 {label: "Akut", value: "akut"},
 {label: "Barn och Ungdom", value: "barn"},
+{label: "Kirurgi och Urologi", value: "Kirurgi"},
+{label: "Serviceförråd", value: "Service"},
 ]
 
   const optionsAdd = [ //Avdelnings drop down meny för manuell tilläggning
     {label: "Hjärt och lung", value: "heart"},
     {label: "Akut", value: "akut"},
     {label: "Barn och Ungdom", value: "barn"},
+    {label: "Kirurgi och Urologi", value: "Kirurgi"},
+{label: "Serviceförråd", value: "Service"},
   ]
 
 //--------------------- ENDOF VAL AV AVDELNING --------------------------------- 
@@ -243,7 +236,7 @@ const options = [ //Avdelnings drop down meny
 
   function handleSelect(event){ //Sätter in värdet i avdelning från vald i drop down
     setAvdelning(event.target.value);
-    setMessage("2");
+    setMessage("");
   }
 
   function manHandleSelect(event){ //Sätter in värdet i manAvdelning från vald i drop down för manuell tilläggning
@@ -296,7 +289,7 @@ const options = [ //Avdelnings drop down meny
     setMessage("Borttagning lyckades");
 
     setTimeout(() => {
-      setMessage("");
+      setMessage("Borttagning lyckades");
       setRemoved("");
     }, 500);
   }
