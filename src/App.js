@@ -183,20 +183,20 @@ const filterChoice = isSectionSelected ? groupedRows : filteredGroupedRows;
 
 //--------------------- VAL AV AVDELNING --------------------------- 
 const options = [ //Avdelnings drop down meny
-{label: "Alla Avdelningar", value: "all"},
-{label: "Hjärt och lung", value: "heart"},
-{label: "Akut", value: "akut"},
-{label: "Barn och Ungdom", value: "barn"},
-{label: "Kirurgi och Urologi", value: "Kirurgi"},
-{label: "Serviceförråd", value: "Service"},
+{label: "Alla Avdelningar", value: ""},
+{label: "Hjärt och Lung", value: "Hjärt och Lung"},
+{label: "Akut", value: "Akut"},
+{label: "Barn och Ungdom", value: "Barn och Ungdom"},
+{label: "Kirurgi och Urologi", value: "Kirurgi och Urologi"},
+{label: "Serviceförråd", value: "Serviceförråd"},
 ]
 
   const optionsAdd = [ //Avdelnings drop down meny för manuell tilläggning
-    {label: "Hjärt och lung", value: "heart"},
-    {label: "Akut", value: "akut"},
-    {label: "Barn och Ungdom", value: "barn"},
-    {label: "Kirurgi och Urologi", value: "Kirurgi"},
-{label: "Serviceförråd", value: "Service"},
+    {label: "Hjärt och lung", value: "Hjärt och Lung"},
+    {label: "Akut", value: "Akut"},
+    {label: "Barn och Ungdom", value: "Barn och Ungdom"},
+    {label: "Kirurgi och Urologi", value: "Kirurgi och Urologi"},
+{label: "Serviceförråd", value: "Serviceförråd"},
   ]
 
 //--------------------- ENDOF VAL AV AVDELNING --------------------------------- 
@@ -248,7 +248,6 @@ const options = [ //Avdelnings drop down meny
 
   function addManually(){ //Lägg till läkemedel. Kolla så alla fält är ifyllda och att läkemedlet inte redan finns på avdelningen, visa pop-up
     console.log('add manually');
-    //const inDataBase = JSON.stringify(medDataArray).toLowerCase();
     if(manName === "" || manDate === "" || manLot === ""){
       setMessage("Fyll i alla fält");
     }else{
@@ -267,7 +266,7 @@ const options = [ //Avdelnings drop down meny
     }}
   }
   
-  function submitManually(){ //tilläggning bekräftad, slutför tilläggning till databas och meddela användare
+  function submitManually(){ //tilläggning bekräftad, slutför tilläggning till databas och meddela användare, om checkbox checkad rensa alla fält
       submitScannedItem(manName, manDate, manLot, manAvdelning);
       setMessage("Tilläggning lyckades");
       var checkBox = document.getElementById("myCheck");
@@ -296,6 +295,7 @@ const options = [ //Avdelnings drop down meny
     }, 500);
   }
 
+  //alternera Checked
   const handleCheckboxChange = () => {
     setChecked(!Checked);
   }
@@ -309,11 +309,11 @@ const options = [ //Avdelnings drop down meny
                  baserat på läkemedelsnamn eller LOT-nummer. filterChoice sätts beroende på sökrutans inehåll*/
   }
   const sortedFilterChoice = [...filterChoice].sort((a, b) => {
-    // Compare years first
+    // Jämför år
     if (a.year !== b.year) {
       return a.year - b.year;
     }
-    // If years are the same, compare months
+    // om år är samma, jämför månader
     return a.month - b.month;
   });
 
@@ -620,11 +620,6 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
   return (
     isComputer ? 
     <div className="App" >
-      {/*<h1>{avdelning}</h1> test av dropdown*/}
-      {/*<h1>{manName}</h1> {/*test av sökfält*/}
-      {/*<h1>{manDate}</h1> {/*test av sökfält*/}
-      {/*<h1>{manLot}</h1> {/*test av sökfält*/}
-      {/*<h1>{manAvdelning}</h1> {/*test av sökfält*/}
       <div className="search-bar">{/* Div till val av avdelning och sökning av produkt */}
       
         <div className="left-search">
@@ -646,7 +641,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
             <input 
                 className="searchBox"
                 placeholder="Sök efter Batch/Läkemedelsnamn"
-                onChange={(e) => {setSearchTerm(e.target.value); setMessage("")}} //Innuti klamrar , skapa funktion som hämtar sökt objekt från JSON-fil
+                onChange={(e) => {setSearchTerm(e.target.value); setMessage("")}}
               />
           </div>
         </div>
@@ -701,6 +696,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
           </div>
         </div>
 
+      {/* popup för konfimration av tilläggning */}
       <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually} confirmButtonText="Lägg till">
         <h3>Lägg till:</h3>
         <p>Läkemedelsnamn: {manName}</p>
@@ -709,6 +705,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
         <p>Avdelning: {manAvdelning}</p>
       </Popup>
       
+      {/* popup för konfimration av borttagning */}
       <Popup trigger={removeButtonPopup} setTrigger={setRemoveButtonPopup} setManually={confirmRemoveManually} confirmButtonText="Ta bort">
         <h3>Ta bort:</h3>
         <p> Läkemedelsnamn: {removeGtin}</p>
@@ -794,6 +791,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
         
       </div>
     </div>
+    {/* popup för konfimration av tilläggning */}
     <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually}>
         <h3>Lägg till:</h3>
         <p>Läkemedelsnamn: {manName}</p>
@@ -802,6 +800,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
         <p>Avdelning: {manAvdelning}</p>
       </Popup>
       
+      {/* popup för konfimration av borttagning */}
       <Popup trigger={removeButtonPopup} setTrigger={setRemoveButtonPopup} setManually={confirmRemoveManually} confirmButtonText="Ta bort">
         <h3>Ta bort:</h3>
         <p> Läkemedelsnamn: {removeGtin}</p>
