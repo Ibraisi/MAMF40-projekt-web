@@ -14,6 +14,7 @@ function getMonthFromDate(dateString) {
 }
 
 //Funktion för hämtning av år från "expiry"
+//Funktion för hämtning av år från "expiry"
 function getYearFromDate(dateString) {
   const date = new Date(dateString);
   const year = date.getFullYear();
