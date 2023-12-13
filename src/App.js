@@ -6,7 +6,6 @@ import Popup from './components/popup';
 import { getMedData, submitScannedItem, deleteItem } from './handles/firebaseHandler';
  
 
-
 //Funktion för hämtning av månad från "expiry"
 function getMonthFromDate(dateString) {
   const date = new Date(dateString);
@@ -14,6 +13,7 @@ function getMonthFromDate(dateString) {
   return month;
 }
 
+//Funktion för hämtning av år från "expiry"
 function getYearFromDate(dateString) {
   const date = new Date(dateString);
   const year = date.getFullYear();
@@ -53,38 +53,31 @@ function sortByMonth(data) {
 
 
 function App() {
-  
 
+  //statusvariabler 
   const [message, setMessage] = useState('');
-
   const [searchTerm, setSearchTerm] = useState('');
-  //const isSearchTermEmpty = searchTerm.trim() === '';
-
   const [removed, setRemoved] = useState('');
-
   const [avdelning, setAvdelning] = useState('');
-  const isSectionSelected = avdelning.trim() === 'all';
-
-  const[buttonPopup, setButtonPopup] = useState(false);
-  const[removeButtonPopup, setRemoveButtonPopup] = useState(false);
-
-  const [manName, setManName] = useState('');
-  const [manDate, setManDate] = useState('');
-  const [manLot, setManLot] = useState('');
-  const [manAvdelning, setManAvdelning] = useState('heart');
-
   const [removeGtin, setRemoveGtin] = useState('');
   const [removeExpiry, setRemoveExpiry] = useState('');
   const [removeLot, setRemoveLot] = useState('');
   const [removeSection, setRemoveSection] = useState('');
 
-  const [medDataArray, setMedDataArray] = useState([]);
+  const [manName, setManName] = useState('');
+  const [manDate, setManDate] = useState('');
+  const [manLot, setManLot] = useState('');
+  const [manAvdelning, setManAvdelning] = useState('Hjärt och Lung');
 
+  const[buttonPopup, setButtonPopup] = useState(false);
+  const[removeButtonPopup, setRemoveButtonPopup] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-
   const [Checked, setChecked] = useState(true);
-
+  const [medDataArray, setMedDataArray] = useState([]);
   
+  const isSectionSelected = avdelning.trim() === 'all';
+
+  //Hämta medicindata när message eller removed ändras
   React.useEffect(() => {
     (async () => {
       const medData = await getMedData();
@@ -93,7 +86,7 @@ function App() {
     })();
   }, [message, removed])
 
-  
+  //sortera läkemedelsdata baserat på expiry
   const sortedMedDataArray = [...medDataArray].sort((a, b) => {
     const expiryA = a.expiry.toLowerCase();
     const expiryB = b.expiry.toLowerCase();
@@ -117,8 +110,6 @@ function App() {
    
 
 const isComputer = window.innerWidth >= 500; //kollar om det är dator, 
-
-
 
 const currentDate = new Date();
 //--------------------- UPPDELNING AV DATA I SEGMENT + SÖKNING --------------------------- 
@@ -192,16 +183,20 @@ const filterChoice = isSectionSelected ? groupedRows : filteredGroupedRows;
 
 //--------------------- VAL AV AVDELNING --------------------------- 
 const options = [ //Avdelnings drop down meny
-{label: "Alla Avdelningar", value: "all"},
-{label: "Hjärt och lung", value: "heart"},
-{label: "Akut", value: "akut"},
-{label: "Barn och Ungdom", value: "barn"},
+{label: "Alla Avdelningar", value: ""},
+{label: "Hjärt och Lung", value: "Hjärt och Lung"},
+{label: "Akut", value: "Akut"},
+{label: "Barn och Ungdom", value: "Barn och Ungdom"},
+{label: "Kirurgi och Urologi", value: "Kirurgi och Urologi"},
+{label: "Serviceförråd", value: "Serviceförråd"},
 ]
 
   const optionsAdd = [ //Avdelnings drop down meny för manuell tilläggning
-    {label: "Hjärt och lung", value: "heart"},
-    {label: "Akut", value: "akut"},
-    {label: "Barn och Ungdom", value: "barn"},
+    {label: "Hjärt och lung", value: "Hjärt och Lung"},
+    {label: "Akut", value: "Akut"},
+    {label: "Barn och Ungdom", value: "Barn och Ungdom"},
+    {label: "Kirurgi och Urologi", value: "Kirurgi och Urologi"},
+{label: "Serviceförråd", value: "Serviceförråd"},
   ]
 
 //--------------------- ENDOF VAL AV AVDELNING --------------------------------- 
@@ -243,7 +238,7 @@ const options = [ //Avdelnings drop down meny
 
   function handleSelect(event){ //Sätter in värdet i avdelning från vald i drop down
     setAvdelning(event.target.value);
-    setMessage("2");
+    setMessage("");
   }
 
   function manHandleSelect(event){ //Sätter in värdet i manAvdelning från vald i drop down för manuell tilläggning
@@ -251,28 +246,65 @@ const options = [ //Avdelnings drop down meny
     setMessage("");
   }
 
-  function addManually(){ //Lägg till läkemedel. Kolla så alla fält är ifyllda och att läkemedlet inte redan finns på avdelningen, visa pop-up
-    console.log('add manually');
-    //const inDataBase = JSON.stringify(medDataArray).toLowerCase();
-    if(manName === "" || manDate === "" || manLot === ""){
-      setMessage("Fyll i alla fält");
-    }else{
-      var duplicate = false;
-      for (const item of medDataArray) {
-        if(item.gtin.toLowerCase() === manName.toLowerCase() && 
-        item.lot === manLot && 
-        item.section.toLowerCase() === manAvdelning.toLowerCase()){
-          duplicate = true;
-        }
-      }
-      if(!duplicate){
-      setButtonPopup(true);
-    }else{
-      setMessage("Läkemedlet finns redan");
-    }}
+ // Funktion som kollar om det manuellt inmatade datumsträngen har formatet ÅÅÅÅ-MM-DD,
+// om år är positiva heltal, om månaden är < 12 och >0,
+// om dagarna är positiva heltal och rätt mängd för månaden
+function isManualDateAcceptable(manualDate) {
+  // Kolla om manualDate matchar formatet ÅÅÅÅ-MM-DD
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!dateRegex.test(manualDate)) {
+    return false;
   }
+
+  // Extrahera år, månad och dag från manualDate
+  const [year, month, day] = manualDate.split('-');
+
+  // Kolla om året är ett positivt heltal
+  if (!/^\d+$/.test(year) || parseInt(year, 10) <= 0) {
+    return false;
+  }
+
+  // Kolla om månaden är ett positivt heltal mellan 1 och 12
+  if (!/^\d+$/.test(month) || parseInt(month, 10) <= 0 || parseInt(month, 10) > 12) {
+    return false;
+  }
+
+  // Kolla om dagen är ett positivt heltal och inom det giltiga intervallet för den angivna månaden
+  if (!/^\d+$/.test(day) || parseInt(day, 10) <= 0 || parseInt(day, 10) > new Date(year, month, 0).getDate()) {
+    return false;
+  }
+
+  // Om alla villkor är uppfyllda, returnera true
+  return true;
+}
+
+function addManually() {
+  console.log('lägg till manuellt');
+  if (manName === "" || manDate === "" || manLot === "") {
+    setMessage("Fyll i alla fält");
+  } else {
+    var duplicate = false;
+    for (const item of medDataArray) {
+      if (
+        item.gtin.toLowerCase() === manName.toLowerCase() &&
+        item.lot === manLot &&
+        item.section.toLowerCase() === manAvdelning.toLowerCase()
+      ) {
+        duplicate = true;
+      }
+    }
+    if (!duplicate && isManualDateAcceptable(manDate)) {
+      setButtonPopup(true);
+    } else if (!isManualDateAcceptable(manDate)) {
+      setMessage("Ogiltigt datum");
+    } else {
+      setMessage("Läkemedlet finns redan");
+    }
+  }
+}
+
   
-  function submitManually(){ //tilläggning bekräftad, slutför tilläggning till databas och meddela användare
+  function submitManually(){ //tilläggning bekräftad, slutför tilläggning till databas och meddela användare, om checkbox checkad rensa alla fält
       submitScannedItem(manName, manDate, manLot, manAvdelning);
       setMessage("Tilläggning lyckades");
       var checkBox = document.getElementById("myCheck");
@@ -296,11 +328,12 @@ const options = [ //Avdelnings drop down meny
     setMessage("Borttagning lyckades");
 
     setTimeout(() => {
-      setMessage("");
+      setMessage("Borttagning lyckades");
       setRemoved("");
     }, 500);
   }
 
+  //alternera Checked
   const handleCheckboxChange = () => {
     setChecked(!Checked);
   }
@@ -314,11 +347,11 @@ const options = [ //Avdelnings drop down meny
                  baserat på läkemedelsnamn eller LOT-nummer. filterChoice sätts beroende på sökrutans inehåll*/
   }
   const sortedFilterChoice = [...filterChoice].sort((a, b) => {
-    // Compare years first
+    // Jämför år
     if (a.year !== b.year) {
       return a.year - b.year;
     }
-    // If years are the same, compare months
+    // om år är samma, jämför månader
     return a.month - b.month;
   });
 
@@ -625,11 +658,6 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
   return (
     isComputer ? 
     <div className="App" >
-      {/*<h1>{avdelning}</h1> test av dropdown*/}
-      {/*<h1>{manName}</h1> {/*test av sökfält*/}
-      {/*<h1>{manDate}</h1> {/*test av sökfält*/}
-      {/*<h1>{manLot}</h1> {/*test av sökfält*/}
-      {/*<h1>{manAvdelning}</h1> {/*test av sökfält*/}
       <div className="search-bar">{/* Div till val av avdelning och sökning av produkt */}
       
         <div className="left-search">
@@ -641,7 +669,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
         </div>
         <div className="title-div">
           <img
-              src="Region_skåne-removebg-preview.png"
+              src="Region_skåne-removebg-preview.png"
               alt="Region Skåne Logo"
               className="title-image"
           />
@@ -651,7 +679,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
             <input 
                 className="searchBox"
                 placeholder="Sök efter Batch/Läkemedelsnamn"
-                onChange={(e) => {setSearchTerm(e.target.value); setMessage("")}} //Innuti klamrar , skapa funktion som hämtar sökt objekt från JSON-fil
+                onChange={(e) => {setSearchTerm(e.target.value); setMessage("")}}
               />
           </div>
         </div>
@@ -706,6 +734,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
           </div>
         </div>
 
+      {/* popup för konfimration av tilläggning */}
       <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually} confirmButtonText="Lägg till">
         <h3>Lägg till:</h3>
         <p>Läkemedelsnamn: {manName}</p>
@@ -714,6 +743,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
         <p>Avdelning: {manAvdelning}</p>
       </Popup>
       
+      {/* popup för konfimration av borttagning */}
       <Popup trigger={removeButtonPopup} setTrigger={setRemoveButtonPopup} setManually={confirmRemoveManually} confirmButtonText="Ta bort">
         <h3>Ta bort:</h3>
         <p> Läkemedelsnamn: {removeGtin}</p>
@@ -799,6 +829,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
         
       </div>
     </div>
+    {/* popup för konfimration av tilläggning */}
     <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually}>
         <h3>Lägg till:</h3>
         <p>Läkemedelsnamn: {manName}</p>
@@ -807,6 +838,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
         <p>Avdelning: {manAvdelning}</p>
       </Popup>
       
+      {/* popup för konfimration av borttagning */}
       <Popup trigger={removeButtonPopup} setTrigger={setRemoveButtonPopup} setManually={confirmRemoveManually} confirmButtonText="Ta bort">
         <h3>Ta bort:</h3>
         <p> Läkemedelsnamn: {removeGtin}</p>
