@@ -752,7 +752,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
       </Popup>
     </div>
     : //Else - sats för mobiler-----------------------------------------------------------------------------------------
-    <div className="mobile-App" style={{ fontSize: "10px" }}> {/* Justerad textstorlek för mobil */}
+    <div className="mobile-App" style={{ fontSize: "8px" }}> {/* Justerad textstorlek för mobil */}
     <div className="search-bar">
       <div className="left-search">
         <select className="mobile-searchBox"  onChange={handleSelect}>
