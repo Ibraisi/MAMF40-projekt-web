@@ -1,5 +1,4 @@
 import "./App.css";
-import fakeData from "./mock_data.json";
 import React, { useState } from "react";
 import Popup from './components/popup';
 //import { useTable, useGroupBy } from "react-table";
@@ -13,7 +12,6 @@ function getMonthFromDate(dateString) {
   return month;
 }
 
-//Funktion för hämtning av år från "expiry"
 //Funktion för hämtning av år från "expiry"
 function getYearFromDate(dateString) {
   const date = new Date(dateString);
@@ -531,7 +529,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
               fontSize: "10px",
             }}
           >
-              <td className="bold-cell" colSpan="10">
+              <td className="bold-cell" colSpan="100%">
                 {year}
               </td>
             </tr>
@@ -548,7 +546,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
               fontSize: "10px",
             }}
           >
-            <td className="bold-cell" colSpan="10">
+            <td className="bold-cell" colSpan="100%">
               {getMonthNameFromNumber(month)}  {year}
             </td>
           </tr>
@@ -744,7 +742,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
         <p>Avdelning: {manAvdelning}</p>
       </Popup>
       
-      {/* popup för konfimration av borttagning */}
+      {/* popup för bekräftelse av borttagning */}
       <Popup trigger={removeButtonPopup} setTrigger={setRemoveButtonPopup} setManually={confirmRemoveManually} confirmButtonText="Ta bort">
         <h3>Ta bort:</h3>
         <p> Läkemedelsnamn: {removeGtin}</p>
@@ -753,11 +751,11 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
         <p> Avdelning: {removeSection}</p>
       </Popup>
     </div>
-    : //Else - sats för mobiler
+    : //Else - sats för mobiler-----------------------------------------------------------------------------------------
     <div className="mobile-App" style={{ fontSize: "10px" }}> {/* Justerad textstorlek för mobil */}
     <div className="search-bar">
       <div className="left-search">
-        <select className="mobile- searchBox"  onChange={handleSelect}>
+        <select className="mobile-searchBox"  onChange={handleSelect}>
           {options.map((option) => (
             <option value={option.value}>{option.label}</option>
           ))}
@@ -779,11 +777,9 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
       </div>
     </div>
 
-    <div className="center-table" style ={{
-      width: "500px"
-    }}>
+    <div className="mobile-center-table">
       <div className="mobile-table-outer-div">
-        <div className="table-div">
+        <div className="mobile-table-div">
           {mobileTable}
           </div>
       </div>
@@ -827,11 +823,20 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
         <button className="mobile-button-add" onClick={() => addManually()}>
           Lägg Till
         </button>
-        
+        <label className="Check"> Töm fält efter tilläggning
+              <input 
+                type="checkbox"
+                id="myCheck" 
+                checked = {Checked}
+                onChange={handleCheckboxChange}/>
+                <span className="checkmark"></span>
+            </label>
+            <p className="message">{message}</p>
       </div>
     </div>
+    
     {/* popup för konfimration av tilläggning */}
-    <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually}>
+    <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually} confirmButtonText="Lägg till">
         <h3>Lägg till:</h3>
         <p>Läkemedelsnamn: {manName}</p>
         <p>Utgångsdatum: {manDate}</p>
@@ -839,7 +844,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
         <p>Avdelning: {manAvdelning}</p>
       </Popup>
       
-      {/* popup för konfimration av borttagning */}
+      {/* popup för bekräftelse av borttagning */}
       <Popup trigger={removeButtonPopup} setTrigger={setRemoveButtonPopup} setManually={confirmRemoveManually} confirmButtonText="Ta bort">
         <h3>Ta bort:</h3>
         <p> Läkemedelsnamn: {removeGtin}</p>

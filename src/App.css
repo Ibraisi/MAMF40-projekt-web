@@ -47,38 +47,30 @@
   background: radial-gradient(circle, rgb(255, 255, 255) 0%,rgb(255, 255, 255) 80%, rgb(202, 202, 202) 100%); 
 }
 
+
 .mobile-App {
-  height: 90vh;
-  display: flex;
+
+  display:inline-flex;
   justify-content: space-evenly;
   align-items: center;
   flex-direction: column;
   background: rgb(233, 233, 233);
-  /* background: radial-gradient(circle, rgba(15,97,136,1) 0%, rgba(116,204,241,1) 80%, rgba(171,228,255,1) 100%);  */
   background: radial-gradient(circle, rgb(255, 255, 255) 0%,rgb(255, 255, 255) 80%, rgb(202, 202, 202) 100%); 
-}
-
-.mobile-App {
-  height: 90vh;
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  flex-direction: column;
-  background: rgb(15,97,136);
-  background: radial-gradient(circle, rgba(15,97,136,1) 0%, rgba(116,204,241,1) 80%, rgba(171,228,255,1) 100%); 
+  width: 100%;
+  height: 100%;
 }
 
 .table-outer-div{
   width: 75%;
-  height: 65vh;
   overflow: hidden;
   border-radius: 30px;
   border: 2px solid #000;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 .mobile-table-outer-div{
-  width: 75%;
-  height: 65vh;
+  align-items: center;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   border: 2px solid #000;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
@@ -91,15 +83,25 @@
   background-color: #ffffff;
 }
 
+.mobile-table-div{
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: #ffffff;
+}
+
 .center-table {
-  height: 65vh;
+  height: 70vh;
   display: flex;
   justify-content: center;
   width: 100%;
 }
-
-
-
+.mobile-center-table {
+  height: 70vh;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
 .search-bar {
   height: 5vh;
   width: 70%;
@@ -158,7 +160,6 @@
   width: 100px;
   height: 20px;
   padding: 12px 2px;
-  margin: 8px 0;
   display: inline-block;
   border: 1px solid #ccc;
   border-radius: 20px;
@@ -215,12 +216,12 @@
 }
 
 .mobile-manual-input {
-  width: 70px; /* Adjust the width to half of the original size */
-  padding: 3px 5px; /* Adjust padding as needed */
+  width: 70px; 
+  padding: 3px 5px; 
   margin: 4px 0;
   display: inline-block;
   border: 1px solid #ccc;
-  border-radius: 10px; /* Adjust border radius as needed */
+  border-radius: 10px; 
   box-sizing: border-box;
   box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
   background: #fff;
@@ -280,17 +281,7 @@
   background-color: #919191; /* Darker shade when pressed */
 }
 
-.mobile-button-remove{
-  height: 30px;
-  width: 15px;
-  border-radius: 14px;
-  border: 4px;
-  font-size: 15px; 
-  transition: background-color 0.1s;
-}
-.mobile-button-remove:active {
-  background-color: #919191; /* Darker shade when pressed */
-}
+
 
 
 
