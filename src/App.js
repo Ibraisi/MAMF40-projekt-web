@@ -719,8 +719,8 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
               </select>
             <button className="button-add"
               onClick={() => {addManually(); console.log(Checked, document.getElementById("myCheck").checked);}}
-            >Lägg Till</button>
-            
+            >Lägg Till
+            </button>
             <label className="Check"> Töm fält efter tilläggning
               <input 
                 type="checkbox"
@@ -784,37 +784,31 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
           </div>
       </div>
     </div>
-
+    
     <div className="mobile-manual-box">
       <div style={{ height: "10px", width: "100%" }}>
         <p className="mobile-textAdd">Lägg Till Manuellt</p>
       </div>
-
+      
       <div className="manual-input-div">
         <input
-          className="mobile-manual-input"
-          placeholder="Namn"
-          onChange={(e) => {
-            setManName(e.target.value);
-            setMessage("");
-          }}
-        />
-        <input
-          className="mobile-manual-input"
-          placeholder="(ÅÅÅÅ-MM-DD)"
-          onChange={(e) => {
-            setManDate(e.target.value);
-            setMessage("");
-          }}
-        />
-        <input
-          className="mobile-manual-input"
-          placeholder="Batch-nr"
-          onChange={(e) => {
-            setManLot(e.target.value);
-            setMessage("");
-          }}
-        />
+              id="input"
+              className="mobile-manual-input"
+              placeholder="Läkemedelsnamn"
+              onChange={(e) => {setManName(e.target.value); setMessage("")}}         
+            />
+            <input
+              id="input2"
+              className="mobile-manual-input"
+              placeholder="Utgångsdatum(ÅÅÅÅ-MM-DD)"
+              onChange={(e) => {setManDate(e.target.value); setMessage("")}}
+            />
+            <input
+              id="input3"
+              className="mobile-manual-input"
+              placeholder="Batch-nr"
+              onChange={(e) => {setManLot(e.target.value); setMessage("")}}
+            />
         <select className="mobile-manual-input" onChange={manHandleSelect}>
           {optionsAdd.map((option) => (
             <option value={option.value}>{option.label}</option>
