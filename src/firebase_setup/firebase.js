@@ -8,16 +8,16 @@ import { getFirestore } from "@firebase/firestore"
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 
-//testdatabas
+//Main-databas
 const firebaseConfig = {
-  apiKey: "AIzaSyCD8yv47IsHHds_P04TaAsnfv7502W4TKU",
-  authDomain: "region-skane-1-test.firebaseapp.com",
-  projectId: "region-skane-1-test",
-  storageBucket: "region-skane-1-test.appspot.com",
-  messagingSenderId: "1044801464291",
-  appId: "1:1044801464291:web:b8dcaf560972e94ec7a2d6",
-  measurementId: "G-52DYB3KW8Q"
-};
+  apiKey: "AIzaSyDMGlAc6vqX-EeyXf_tn48hw6IW0svedcE",
+  authDomain: "med-scan-9eb68.firebaseapp.com",
+  projectId: "med-scan-9eb68", 
+  storageBucket: "med-scan-9eb68.appspot.com",
+  messagingSenderId: "779832264677",
+  appId: "1:779832264677:web:c2c08111b71ab6a976910c"
+}; 
+
 
 // const firebaseConfig = {
 //     apiKey: process.env.REACT_APP_apiKey,

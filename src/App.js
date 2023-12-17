@@ -553,6 +553,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
           <tr
             style={{
               border: "0.5px solid #000",
+              textAlign: "center",
             }}
           >
             <th>Status</th>
@@ -567,6 +568,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
             <tr
               style={{
                 border: "0.5px solid grey",
+                textAlign: "center",
                 background:  expired(row.expiry)
                   ? "#ea6e6e"
                   : "#fff",
@@ -581,7 +583,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
                   >
                     !
                     {isHovered && (
-                      <div className="expiring-tooltip-content">
+                      <div className="mobile-expiring-tooltip-content">
                         Går ut om {daysUntilExpires(row.expiry)} dagar
                       </div>
                     )}
@@ -594,7 +596,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
                   >
                     !
                     {isHovered && (
-                      <div className="expired-tooltip-content">Utgången</div>
+                      <div className="mobile-expired-tooltip-content">Utgången</div>
                     )}
                   </div>
                 ) : (
@@ -752,7 +754,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
       </Popup>
     </div>
     : //Else - sats för mobiler-----------------------------------------------------------------------------------------
-    <div className="mobile-App" style={{ fontSize: "8px" }}> {/* Justerad textstorlek för mobil */}
+    <div className="mobile-App" style={{ fontSize: "10px" }}> {/* Justerad textstorlek till mobildisplay */}
     <div className="search-bar">
       <div className="left-search">
         <select className="mobile-searchBox"  onChange={handleSelect}>

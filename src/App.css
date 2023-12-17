@@ -248,25 +248,28 @@
   height: 30px;
   width: 80px;
   border-radius: 20px;
-  border: 4px double;
+ 
+  background-color: green;
+  color:#fff;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   transition: background-color 0.1s;
   margin-right: 10px;
   margin-left: 10px;
 }
 .button-add:active {
-  background-color: #919191; /* Darker shade when pressed */
+  background-color: darkgreen; /* Darker shade when pressed */
 }
 .mobile-button-add{
   height: 40px;
   width: 55px;
   border-radius: 20px;
-  border: 4px double;
+  background-color: green;
+  color:#fff;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   transition: background-color 0.1s;
 }
 .mobile-button-add:active {
-  background-color: #919191; /* Darker shade when pressed */
+  background-color: green; /* Darker shade when pressed */
 }
 
 .button-remove{
@@ -314,6 +317,17 @@ table {
 
 }
 
+.mobile-expired-tooltip-content {
+  position: absolute;
+  font-size: x-small;
+  width: min-content;
+  bottom: 30%;
+  
+  background-color: rgb(255, 179, 0);
+  padding: 1px;
+
+}
+
 .expiring-tooltip-content {
   position: absolute;
   width:max-content;
@@ -323,6 +337,15 @@ table {
   padding: 1px;
 }
 
+.mobile-expiring-tooltip-content {
+  font-size: x-small;
+  position: absolute;
+  width:max-content;
+  top: 10%;
+  left: 0%;
+  background-color: rgb(246, 255, 0);
+  padding: 1px;
+}
 .custom-tooltip.show .tooltip-content {
   display: block;
 }
