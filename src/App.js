@@ -53,6 +53,7 @@ function sortByMonth(data) {
 
 function App() {
 
+
   //statusvariabler 
   const [message, setMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -301,7 +302,6 @@ function addManually() {
     }
   }
 }
-
   
   function submitManually(){ //tilläggning bekräftad, slutför tilläggning till databas och meddela användare, om checkbox checkad rensa alla fält
       submitScannedItem(manName, manDate, manLot, manAvdelning);
@@ -344,6 +344,7 @@ function addManually() {
   {
     /*Om sökfönster är tomt, renderea som vanligt, annars rendererar man bara de sökninens träffar
                  baserat på läkemedelsnamn eller LOT-nummer. filterChoice sätts beroende på sökrutans inehåll*/
+
   }
   const sortedFilterChoice = [...filterChoice].sort((a, b) => {
     // Jämför år
@@ -659,6 +660,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
   return (
     isComputer ? 
     <div className="App" >
+
       <div className="search-bar">{/* Div till val av avdelning och sökning av produkt */}
       
         <div className="left-search">
@@ -688,6 +690,7 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
       <div className="center-table">
         <div className="table-outer-div">
           <div className="table-div">
+
             {table}
           </div>
         </div>
@@ -735,8 +738,10 @@ const mobileTable = sortedFilterChoice.map(({ year, month, rows }) => {
           </div>
         </div>
 
+
       {/* popup för konfimration av tilläggning */}
       <Popup trigger={buttonPopup} setTrigger={setButtonPopup} setManually={submitManually} confirmButtonText="Lägg till">
+
         <h3>Lägg till:</h3>
         <p>Läkemedelsnamn: {manName}</p>
         <p>Utgångsdatum: {manDate}</p>

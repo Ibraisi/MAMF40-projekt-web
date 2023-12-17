@@ -8,9 +8,8 @@ function Popup(props) {
                 { props.children }
 
                 <button className="close-btn" onClick={() => props.setTrigger(false) } >Avbryt</button>
-                <button className="confirm-btn" onClick={() => { props.setTrigger(false); props.setManually(); }}>{props.confirmButtonText}</button>
-                
 
+                <button className="confirm-btn" onClick={() => { props.setTrigger(false); props.setManually(); }}>{props.confirmButtonText}</button>
             </div>
         </div>
     ) : "";
