@@ -42,15 +42,36 @@
   justify-content: space-evenly;
   align-items: center;
   flex-direction: column;
-  background: rgb(15,97,136);
-  background: radial-gradient(circle, rgba(15,97,136,1) 0%, rgba(116,204,241,1) 80%, rgba(171,228,255,1) 100%); 
+  background: rgb(233, 233, 233);
+  /* background: radial-gradient(circle, rgba(15,97,136,1) 0%, rgba(116,204,241,1) 80%, rgba(171,228,255,1) 100%);  */
+  background: radial-gradient(circle, rgb(255, 255, 255) 0%,rgb(255, 255, 255) 80%, rgb(202, 202, 202) 100%); 
+}
+
+
+.mobile-App {
+
+  display:inline-flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-direction: column;
+  background: rgb(233, 233, 233);
+  background: radial-gradient(circle, rgb(255, 255, 255) 0%,rgb(255, 255, 255) 80%, rgb(202, 202, 202) 100%); 
+  width: 100%;
+  height: 100%;
 }
 
 .table-outer-div{
   width: 75%;
-  height: 65vh;
   overflow: hidden;
   border-radius: 30px;
+  border: 2px solid #000;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+.mobile-table-outer-div{
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   border: 2px solid #000;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
@@ -60,18 +81,27 @@
   height: 100%;
   overflow: auto;
   background-color: #ffffff;
-  
+}
+
+.mobile-table-div{
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: #ffffff;
 }
 
 .center-table {
-  height: 65vh;
+  height: 70vh;
   display: flex;
   justify-content: center;
   width: 100%;
 }
-
-
-
+.mobile-center-table {
+  height: 70vh;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
 .search-bar {
   height: 5vh;
   width: 70%;
@@ -90,10 +120,15 @@
 
 .title-div{
   height: 5vh;
-  width: 33%;
+  width: 30%;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.title-image {
+  width: 110px; 
+  height: 110px; 
 }
 
 .title-name{
@@ -112,7 +147,7 @@
 
 .searchBox{
   width: 240px;
-  padding: 12px 20px;
+  padding: 8px 20px;
   margin: 8px 0;
   display: inline-block;
   border: 1px solid #ccc;
@@ -121,7 +156,17 @@
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
   background: #fff;
 }
-
+.mobile-searchBox{
+  width: 100px;
+  height: 20px;
+  padding: 12px 2px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  background: #fff;
+}
 
 
 .manual-input-div{
@@ -147,6 +192,17 @@
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
+.mobile-manual-box{
+  display: flex;
+  flex-direction: column;
+  height: 12vh;
+  width: 100%;
+  border-style: solid;
+  border-width: 1px;
+  background-color: #d2d2d2;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
 .manual-input{
   width: 240px;
   padding: 6px 20px;
@@ -159,20 +215,76 @@
   background: #fff;
 }
 
+.mobile-manual-input {
+  width: 70px; 
+  padding: 3px 5px; 
+  margin: 4px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 10px; 
+  box-sizing: border-box;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15);
+  background: #fff;
+}
+
+
+.message{
+  height:20px;
+}
+
 .textAdd{
   font-weight: bold;
   font-size: 20px;
+  margin-top: 10px;
+}
+.mobile-textAdd{
+  font-weight: bold;
+  font-size: 10px;
   margin-top: 5px;
 }
+
 
 .button-add{
   height: 30px;
   width: 80px;
   border-radius: 20px;
-  border: 4px double;
+ 
+  background-color: green;
+  color:#fff;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-  
+  transition: background-color 0.1s;
+  margin-right: 10px;
+  margin-left: 10px;
 }
+.button-add:active {
+  background-color: darkgreen; /* Darker shade when pressed */
+}
+.mobile-button-add{
+  height: 40px;
+  width: 55px;
+  border-radius: 20px;
+  background-color: green;
+  color:#fff;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.1s;
+}
+.mobile-button-add:active {
+  background-color: green; /* Darker shade when pressed */
+}
+
+.button-remove{
+  height: 30px;
+  width: 25px;
+  border-radius: 20px;
+  border: 4px;
+  font-size: 20px; 
+  transition: background-color 0.1s;
+}
+.button-remove:active {
+  background-color: #919191; /* Darker shade when pressed */
+}
+
+
 
 
 
@@ -185,4 +297,112 @@ table {
   font-weight: bold;
 }
 
+.custom-tooltip {
+  position:relative;
+  display: inline-block;
+  padding: 5px;
+  border: 1px double #ff0000;
+  margin: 1px;
+  font-size: large;
+  border-radius: 50px;
+}
+
+
+.expired-tooltip-content {
+  position: absolute;
+  top: 10%;
+  left: 500%;
+  background-color: rgb(255, 179, 0);
+  padding: 1px;
+
+}
+
+.mobile-expired-tooltip-content {
+  position: absolute;
+  font-size: x-small;
+  width: min-content;
+  bottom: 30%;
   
+  background-color: rgb(255, 179, 0);
+  padding: 1px;
+
+}
+
+.expiring-tooltip-content {
+  position: absolute;
+  width:max-content;
+  top: 10%;
+  left: 500%;
+  background-color: rgb(246, 255, 0);
+  padding: 1px;
+}
+
+.mobile-expiring-tooltip-content {
+  font-size: x-small;
+  position: absolute;
+  width:max-content;
+  top: 10%;
+  left: 0%;
+  background-color: rgb(246, 255, 0);
+  padding: 1px;
+}
+.custom-tooltip.show .tooltip-content {
+  display: block;
+}
+
+.Check{
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  height: 20px
+}
+
+.Check input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+}
+
+/* When the checkbox is checked, add a blue background */
+.Check input:checked ~ .checkmark {
+  background-color: #2196F3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.Check input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.Check .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
